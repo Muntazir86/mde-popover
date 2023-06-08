@@ -3,10 +3,10 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "material-extended": {
+    "@muntazir/material-extended": {
       "projectType": "library",
-      "root": "projects/material-extended",
-      "sourceRoot": "projects/material-extended/src",
+      "root": "projects/muntazir/material-extended",
+      "sourceRoot": "projects/muntazir/material-extended/src",
       "prefix": "lib",
       "architect": {
         "build": {

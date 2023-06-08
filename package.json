@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build material-extended --configuration production",
-    "build:pack": "ng-packagr -p ./projects/material-extended/ng-package.json",
+    "build:pack": "ng-packagr -p ./projects/muntazir/material-extended/ng-package.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

@@ -1,0 +1,33 @@
+{
+  "name": "@muntazir/material-extended",
+  "version": "5.0.0",
+  "peerDependencies": {
+    "@angular/animations": "^16.0.0",
+    "@angular/cdk": "^16.0.2",
+    "@angular/common": "^16.0.0",
+    "@angular/core": "^16.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "description": "This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.0.",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Muntazir86/mde-popover.git"
+  },
+  "keywords": [
+    "angular",
+    "popover",
+    "material-extended"
+  ],
+  "author": "Ghulam Shabbir",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Muntazir86/mde-popover/issues"
+  },
+  "homepage": "https://github.com/Muntazir86/mde-popover#readme"
+}

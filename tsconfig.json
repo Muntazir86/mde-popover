@@ -10,8 +10,8 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "material-extended": [
-        "dist/material-extended"
+      "@muntazir/material-extended": [
+        "dist/muntazir/material-extended"
       ]
     },
     "noFallthroughCasesInSwitch": true,
