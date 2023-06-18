@@ -3,23 +3,23 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "material-extended": {
+    "@muntazir/material-extended": {
       "projectType": "library",
-      "root": "projects/material-extended",
-      "sourceRoot": "projects/material-extended/src",
+      "root": "projects/muntazir/material-extended",
+      "sourceRoot": "projects/muntazir/material-extended/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/material-extended/ng-package.json"
+            "project": "projects/muntazir/material-extended/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/material-extended/tsconfig.lib.prod.json"
+              "tsConfig": "projects/muntazir/material-extended/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/material-extended/tsconfig.lib.json"
+              "tsConfig": "projects/muntazir/material-extended/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -27,7 +27,7 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "tsConfig": "projects/material-extended/tsconfig.spec.json",
+            "tsConfig": "projects/muntazir/material-extended/tsconfig.spec.json",
             "polyfills": [
               "zone.js",
               "zone.js/testing"
