@@ -1,10 +1,6 @@
 # Angular Popover
 
-[![npm version](https://badge.fury.io/js/%40material-extended%2Fmde.svg)](https://www.npmjs.com/package/%40material-extended%2Fmde)
-[![Build Status](https://travis-ci.org/material-extended/popover.svg?branch=master)](https://travis-ci.org/material-extended/popover)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-[![Join the chat at https://gitter.im/material-extended/mde](https://badges.gitter.im/material-extended/mde.svg)](https://gitter.im/material-extended/mde?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover?ref=badge_shield)
+![npm (scoped)](https://img.shields.io/npm/v/%40muntazir86/material-extended?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40muntazir86%2Fmaterial-extended)
 
 #### Links
 [Popover Demo](https://uixd.co.uk/open-source-software/material-extended/demo) | [StackBlitz Template](https://stackblitz.com/edit/mde-popover)
@@ -12,7 +8,7 @@
 
 
 ### Project status
-Angular Popover is production ready.
+Angular Popover is production ready. This package supports angular v16.
 
 This was originally created as an example for a `@angular/material` issue feature request.
 Issue can be found at [angular/material2#2691](https://github.com/angular/material2/issues/2691)
@@ -45,9 +41,7 @@ If you'd like to contribute please create an issue or pull request.
 ### Installation
 Install npm package using:
 
-`yarn add @material-extended/mde`
-or
-`npm install @material-extended/mde`
+`npm install @muntazir86/material-extended`
 
 Install required packages @angular/cdk
 
@@ -58,7 +52,7 @@ or
 ### Initial setup
 The CDK overlays depend on a small set of structural styles to work correctly. If you're using Angular Material, these styles have been included together with the theme, otherwise if you're using the CDK on its own, you'll have to include the styles yourself. You can do so by importing the prebuilt styles in your global stylesheet:
 
-@import '~@angular/cdk/overlay-prebuilt.css';
+@import '@angular/cdk/overlay-prebuilt.css';
 
 ### Import module
 
@@ -69,7 +63,7 @@ import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
-import { MdePopoverModule } from '@material-extended/mde';
+import { MdePopoverModule } from '@muntazir86/material-extended';
 
 @NgModule({
   declarations: [
@@ -100,7 +94,7 @@ Once a document is created the component can be refactored and released as beta 
 
 ### Issues
 
-Please report bugs and issues [here](https://github.com/material-extended/mde/issues).
+Please report bugs and issues [here](https://github.com/Muntazir86/mde-popover/issues).
 
 ### 
 
