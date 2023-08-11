@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { coerceNumberProperty } from '@angular/cdk/coercion';
-import { MdePopoverPositionX, MdePopoverPositionY, MdePopoverTriggerEvent } from 'projects/material-extended/src/public-api';
+import { MdePopoverPositionX, MdePopoverPositionY, MdePopoverTriggerEvent } from 'projects/muntazir/material-extended/src/public-api';
 
 @Component({
   selector: 'app-builder',

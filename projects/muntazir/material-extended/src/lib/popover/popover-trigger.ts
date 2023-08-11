@@ -116,6 +116,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy { // tslint:d
     /** Popover backdrop close on click */
     @Input('mdePopoverBackdropCloseOnClick') backdropCloseOnClick = true;
 
+    /** Disables popover trigger */
+    @Input('mdeDisablePopoverTrigger') disablePopoverTrigger: boolean = false;
+
     /** Event emitted when the associated popover is opened. */
     @Output() opened = new EventEmitter<void>();
 
@@ -238,7 +241,7 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy { // tslint:d
 
     /** Opens the popover. */
     openPopover(): void {
-        if (!this._popoverOpen && !this._halt) {
+        if (!this._popoverOpen && !this._halt && !this.disablePopoverTrigger) {
             this._createOverlay().attach(this._portal);
     
             this._subscribeToBackdrop();

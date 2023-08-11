@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 
 
-import { MdePopoverModule } from 'projects/material-extended/src/public-api';
+import { MdePopoverModule } from 'projects/muntazir/material-extended/src/public-api';
 
 import { ExamplesModule } from './examples/examples.module';
 import { ErrorModule } from './error/error.module';

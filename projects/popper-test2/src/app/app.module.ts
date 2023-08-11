@@ -11,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
-import { MdePopoverModule } from 'projects/material-extended/src/public-api';
+import { MdePopoverModule } from 'projects/muntazir/material-extended/src/public-api';
 
 import { AppRoutingModule } from './app-routing.module';
 

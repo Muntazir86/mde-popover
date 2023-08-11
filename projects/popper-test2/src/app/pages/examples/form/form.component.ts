@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MdePopoverTrigger } from 'projects/material-extended/src/public-api';
+import { MdePopoverTrigger } from 'projects/muntazir/material-extended/src/public-api';
 
 // import 'rxjs/add/operator/first';
 

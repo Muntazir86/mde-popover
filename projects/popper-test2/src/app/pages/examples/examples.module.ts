@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 
-import { MdePopoverModule } from 'projects/material-extended/src/public-api';
+import { MdePopoverModule } from 'projects/muntazir/material-extended/src/public-api';
 
 import { ExamplesRoutingModule } from './examples-routing.module';
 

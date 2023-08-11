@@ -10,7 +10,12 @@ export class HomeComponent implements OnInit {
 
   constructor() { }
 
+  triggerdisable = false;
   ngOnInit() {
+  }
+
+  toggleDisableBit(){
+    this.triggerdisable = !this.triggerdisable;
   }
 
 }
