@@ -1,6 +1,6 @@
 {
   "name": "popover",
-  "version": "1.0.0",
+  "version": "5.0.4",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
