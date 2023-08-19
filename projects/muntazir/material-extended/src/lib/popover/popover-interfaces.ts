@@ -13,6 +13,7 @@ export interface MdePopoverPanel {
     targetOffsetX: number;
     targetOffsetY: number;
     arrowOffsetX: number;
+    arrowOffsetY: number;
     arrowWidth: number;
     arrowColor: string;
     closeOnClick: boolean;

@@ -1,6 +1,6 @@
 {
   "name": "@muntazir86/material-extended",
-  "version": "5.0.4",
+  "version": "5.1.0",
   "peerDependencies": {
     "@angular/animations": "^16.0.0",
     "@angular/cdk": "^16.0.2",

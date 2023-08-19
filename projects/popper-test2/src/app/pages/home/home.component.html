@@ -4,8 +4,8 @@
 
 <button mat-raised-button color="primary" [mdePopoverTriggerFor]="popover1">Hover Me</button>
 <button mat-raised-button color="accent" [mdePopoverTriggerFor]="popover2" mdePopoverTriggerOn="click" [mdePopoverBackdropCloseOnClick]="false">Click Me</button>
-<button mat-button color="primary" [mdePopoverTriggerFor]="popover3" mdePopoverTriggerOn="click" mdePopoverPositionX="before" [mdePopoverCloseOnClick]="false">Click Me</button>
-<button mat-button color="accent" [mdePopoverTriggerFor]="popover4" mdePopoverPositionX="before" [mdePopoverCloseOnClick]="false">Hover Me</button>
+<button mat-button color="primary" [mdePopoverTriggerFor]="popover3" mdePopoverTriggerOn="click" [mdePopoverCloseOnClick]="false">Click Me</button>
+<button mat-button color="accent" [mdePopoverTriggerFor]="popover4" [mdePopoverCloseOnClick]="false">Hover Me</button>
 <button mat-raised-button color="primary" [mdePopoverTriggerFor]="popover5" [mdeDisablePopoverTrigger]="this.triggerdisable" title="click button to toggle trigger disable bit" (click)="toggleDisableBit()">Hover Me</button>
 
 
@@ -37,7 +37,11 @@
   </mat-card>
 </mde-popover>
 
-<mde-popover #popover2="mdePopover">
+<mde-popover #popover2="mdePopover"
+  [mdePopoverOverlapTrigger]="false"
+  [mdePopoverPositionX]="'center'"
+  [mdePopoverPositionY]="'above'"
+  >
   <mat-card class="example-card">
     <mat-card-content>
       <p>
@@ -51,7 +55,11 @@
   </mat-card>
 </mde-popover>
 
-<mde-popover #popover3="mdePopover">
+<mde-popover #popover3="mdePopover"
+  [mdePopoverOverlapTrigger]="false"
+  [mdePopoverPositionX]="'center'"
+  [mdePopoverPositionY]="'below'"
+  >
   <mat-card class="example-card">
     <mat-card-content>
       <p>
@@ -66,7 +74,11 @@
 </mde-popover>
 
 
-<mde-popover #popover4="mdePopover" [mdePopoverDisableAnimation]="true" [mdePopoverLeaveDelay]="1000">
+<mde-popover #popover4="mdePopover" 
+[mdePopoverDisableAnimation]="true" [mdePopoverLeaveDelay]="1000"
+[mdePopoverPositionX]="'before'" 
+[mdePopoverPositionY]="'center'"
+>
   <mat-card class="example-card">
     <mat-card-content>
       <p>
@@ -80,8 +92,12 @@
   </mat-card>
 </mde-popover>
 
-<mde-popover #popover5="mdePopover" [mdePopoverOffsetY]="70" >
-  <mat-card class="example-card">
+<mde-popover #popover5="mdePopover"
+  [mdePopoverOverlapTrigger]="false"
+  [mdePopoverPositionX]="'after'"
+  [mdePopoverPositionY]="'center'"
+  >
+  <mat-card>
     <mat-card-content>
       <p>
         Click popover, I will close.

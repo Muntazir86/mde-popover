@@ -3,7 +3,8 @@
 ![npm (scoped)](https://img.shields.io/npm/v/%40muntazir86/material-extended?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40muntazir86%2Fmaterial-extended)
 
 #### Links
-[Popover Demo](https://uixd.co.uk/open-source-software/material-extended/demo) | [StackBlitz Template](https://stackblitz.com/edit/mde-popover)
+[Popover Demo](https://uixd.co.uk/open-source-software/material-extended/demo) | [StackBlitz Template](https://stackblitz.com/edit/mde-popover) | 
+[Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md)
 
 
 
@@ -33,10 +34,6 @@ If you'd like to contribute please create an issue or pull request.
 **Google+ style popover**
 
 ![image](https://cloud.githubusercontent.com/assets/10200431/22397870/4f27ddba-e573-11e6-943f-2d737b59d39e.png)
-
-
-
-
 
 ### Installation
 Install npm package using:
@@ -78,18 +75,108 @@ import { MdePopoverModule } from '@muntazir86/material-extended';
 })
 export class AppModule { }
 ```
-
-### Todo
-1. A design document needs creating to finalise requirements and API specifications.
-Once a document is created the component can be refactored and released as beta for testing.
-2. Refactor now that @angular/cdk is released.
+### Usage
+`<mde-popover>` is a floating panel containing html content. 
 
 
-### Available features
+By itself, the `<mde-popover>` element does not render anything. The popover is attached to and opened 
+via application of the `mdePopoverTriggerFor` directive:
 
-| Feature | Notes                                                                                | Docs                                                                        |
-|---------|--------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| popover | In-progress ([popover demo](https://uixd.co.uk/open-source-software/material-extended/demo)) | [Docs](https://github.com/material-extended/mde/blob/master/projects/material-extended/mde/src/lib/popover/popover.md) |
+```html
+<mde-popover #appPopover="mdePopover">
+  <button md-button> Settings </button>
+  <button md-button> Help </button>
+</mde-popover>
+
+<button md-button [mdePopoverTriggerFor]="appPopover"
+mdePopoverTriggerOn="click">
+   <md-icon>more_vert</md-icon>
+</button>
+```
+
+
+# API reference
+
+### MdePopover
+##### Selector: `mde-popover`
+##### Exported as: `mdePopover`
+
+##### Properties
+| **Name**                                                             | **Description**                                                                                                                                                                                                                       |
+|----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| @Input('mdePopoverPositionX') positionX                              | Position of the popover in the X axis. Type: string, Values:  'start' || 'end' || 'before' || 'after' || 'center', Default:  'after'.                                                                                                 |
+| @Input('mdePopoverPositionY') positionY                              | Position of the popover in the Y axis. Type: string, Values:  'start' || 'end' || 'above' || 'below' || 'center', Default:  'below'                                                                                                   |
+| @Input('mdePopoverTriggerOn') triggerEvent                           | Event for triggering popover 'click', 'hover' and 'none'. Default: hover                                                                                                                                                              |
+| @Input('mdePopoverEnterDelay') enterDelay                            | Delay for popover before enters, Type: number, Default:  200                                                                                                                                                                          |
+| @Input('mdePopoverLeaveDelay') leaveDelay                            | Delay for popover before leaves, Type: number, Default:  200                                                                                                                                                                          |
+| @Input('mdePopoverOverlapTrigger') overlapTrigger                    | Whether the popover should overlap its trigger. Type: boolean, Default: true                                                                                                                                                          |
+| @Input('mdePopoverOffsetX') targetOffsetX                            | Offset position of the popover from target in the X axis. Type: number, Default: 0                                                                                                                                                    |
+| @Input('mdePopoverOffsetY') targetOffsetY                            | Offset position of the popover from target in the Y axis. Type: number, Default: 0                                                                                                                                                    |
+| @Input('mdePopoverArrowOffsetX') arrowOffsetX                        | Offset position of the popover arrow from the X axis. Type: number, Default: 0                                                                                                                                                        |
+| @Input('mdePopoverArrowOffsetY') arrowOffsetY                        | Offset position of the popover arrow from the Y axis. Type: number, Default: 0                                                                                                                                                        |
+| @Input('mdePopoverArrowWidth') arrowWidth                            | Arrow width in pixels.                                                                                                                                                                                                                |
+| @Input('mdePopoverArrowColor') arrowColor                            | Arrow color, accepts CSS color values. Default: rgba(0, 0, 0, 0.12)                                                                                                                                                                   |
+| @Input('mdePopoverCloseOnClick') closeOnClick                        | Whether the popover should close on click. Type: boolean, Default: true                                                                                                                                                               |
+| @Input('mdeFocusTrapEnabled') focusTrapEnabled                       | Whether the popover should focus trap. Type: boolean, Default: true                                                                                                                                                                   |
+| @Input('mdeFocusTrapAutoCaptureEnabled') focusTrapAutoCaptureEnabled | Whether the popover should focus trap auto capture focus. Type: boolean, Default: true                                                                                                                                                |
+| @Input('class') classList                                            | This method takes classes set on the host mde-popover element and applies them on the popover template that displays in the overlay container. Otherwise, it's difficult to style the containing popover from outside the component.  |
+| @Output() close                                                      | Event emitted when the popover is closed.                                                               
+##### Methods
+`setPositionClasses`
+
+It's necessary to set position-based classes to ensure the popover panel animation folds out from the correct direction.
+
+| Parameters |
+|------------|
+| `posX?`    |
+| `posY?`    |
+
+
+
+
+
+
+
+### MdePopoverTrigger
+This directive is intended to be used in conjunction with an mde-popover tag. It is responsible for toggling the display of the provided popover instance.
+
+##### Selector: `[mdePopoverTriggerFor]`
+##### Exported as: `mdePopoverTrigger`
+
+| Name                                                          | Description                                                                             |
+|---------------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| @Input('mdePopoverTriggerFor') popover                        | References the popover instance that the trigger is associated with.                    |
+| @Input('mdePopoverTargetAt') targetElement                    | References the popover target instance that the popover positioning is associated with. |
+| @Input('mdePopoverPositionX') positionX                       | Position of the popover in the X axis.                                                  |
+| @Input('mdePopoverPositionY') positionY                       | Position of the popover in the Y axis.                                                  |
+| @Input('mdePopoverTriggerOn') triggerEvent                    | Event for triggering popover 'click', 'hover' and 'none'. Default: 'hover'                      |
+| @Input('mdePopoverEnterDelay') enterDelay                     | Delay for popover before enters, Type: number, Default: 200                                                         |
+| @Input('mdePopoverLeaveDelay') leaveDelay                     | Delay for popover before leaves, Type: number, Default: 200                                                         |
+| @Input('mdePopoverOverlapTrigger') overlapTrigger             | Whether the popover should overlap its trigger. Type: boolean, Default: true                                         |
+| @Input('mdeDisablePopoverTrigger') disablePopoverTrigger             | Disables popover trigger. Type: boolean, Default: false                                         |
+| @Input('mdePopoverOffsetX') targetOffsetX                     | Offset position of the popover from target in the X axis. Type: number, Default: 0                               |
+| @Input('mdePopoverOffsetY') targetOffsetY                     | Offset position of the popover from target in the Y axis. Type: number, Default: 0                              |
+| @Input('mdePopoverArrowOffsetX') arrowOffsetX                 | Offset position of the popover arrow from the X axis. Type: number, Default: 0                                   |
+| @Input('mdePopoverArrowOffsetY') arrowOffsetX                 | Offset position of the popover arrow from the Y axis. Type: number, Default: 0                                   |
+| @Input('mdePopoverArrowWidth') arrowWidth                     | Arrow width in pixels. Type: number, Default: 8                                                                  |
+| @Input('mdePopoverArrowColor') arrowColor                     | Arrow color, accepts CSS color values. Default: rgba(0, 0, 0, 0.12)                     |
+| @Input('mdePopoverCloseOnClick') closeOnClick                 | Whether the popover should close on click. Type: boolean, Default: true.                                              |
+| @Input('mdePopoverBackdropCloseOnClick') backdropCloseOnClick | Whether the popover should close on backdrop click. Type: boolean, Default: true.                                    |
+| @Output() opened                                              | Event emitted when the associated popover is opened.                                    |
+| @Output() closed                                              | Event emitted when the associated popover is closed.                                    |
+
+##### Methods
+`togglePopover`
+Toggles the popover between the open and closed states.
+
+`openPopover`
+Opens the popover.
+
+`closePopover`
+Closes the popover.
+
+`destroyPopover`
+Removes the popover from the DOM.
 
 
 ### Issues

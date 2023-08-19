@@ -11,18 +11,18 @@ export function throwMdePopoverMissingError() {
 
 /**
  * Throws an exception for the case when popover's mdePopoverPositionX value isn't valid.
- * In other words, it doesn't match 'before' or 'after'.
+ * In other words, it doesn't match 'before', 'after' 'start', 'end' or 'center'.
  */
 export function throwMdePopoverInvalidPositionX() {
-  throw Error(`mdePopoverPositionX value must be either 'before' or after'.
+  throw Error(`mdePopoverPositionX value must be 'before', 'after', 'start', 'end' or 'center'.
       Example: <mde-popover mdePopoverPositionX="before" #popover="mdePopover"></mde-popover>`);
 }
 
 /**
  * Throws an exception for the case when popover's mdePopoverPositionY value isn't valid.
- * In other words, it doesn't match 'above' or 'below'.
+ * In other words, it doesn't match 'above', 'below', 'start', 'end' or 'center'.
  */
 export function throwMdePopoverInvalidPositionY() {
-  throw Error(`mdePopoverPositionY value must be either 'above' or below'.
+  throw Error(`mdePopoverPositionY value must be 'above', 'below', 'start', 'end' or 'center'.
       Example: <mde-popover mdePopoverPositionY="above" #popover="mdePopover"></mde-popover>`);
 }

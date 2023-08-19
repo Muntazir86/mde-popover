@@ -18,7 +18,7 @@ import { AnimationEvent } from '@angular/animations';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { ESCAPE } from '@angular/cdk/keycodes';
 
-import { MdePopoverPositionX, MdePopoverPositionY, MdePopoverTriggerEvent, MdePopoverScrollStrategy } from './popover-types';
+import { MdePopoverPositionX, MdePopoverPositionY, MdePopoverTriggerEvent, MdePopoverScrollStrategy, VALID_PositionX, VALID_PositionY } from './popover-types';
 import { throwMdePopoverInvalidPositionX, throwMdePopoverInvalidPositionY } from './popover-errors';
 import { MdePopoverPanel } from './popover-interfaces';
 import { transformPopover } from './popover-animations';
@@ -49,7 +49,8 @@ export class MdePopover implements MdePopoverPanel, OnDestroy { // tslint:disabl
   private _disableAnimation = false;
   private _targetOffsetX = 0;
   private _targetOffsetY = 0;
-  private _arrowOffsetX = 20;
+  private _arrowOffsetX = 0;
+  private _arrowOffsetY = 0;
   private _arrowWidth = 8;
   private _arrowColor = 'rgba(0, 0, 0, 0.12)';
   private _closeOnClick = true;
@@ -83,7 +84,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy { // tslint:disabl
   @Input('mdePopoverPositionX')
   get positionX() { return this._positionX; }
   set positionX(value: MdePopoverPositionX) {
-    if (value !== 'before' && value !== 'after') {
+    if (!VALID_PositionX.includes(value)) {
       throwMdePopoverInvalidPositionX();
     }
     this._positionX = value;
@@ -94,7 +95,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy { // tslint:disabl
   @Input('mdePopoverPositionY')
   get positionY() { return this._positionY; }
   set positionY(value: MdePopoverPositionY) {
-    if (value !== 'above' && value !== 'below') {
+    if (!VALID_PositionY.includes(value)) {
       throwMdePopoverInvalidPositionY();
     }
     this._positionY = value;
@@ -140,6 +141,11 @@ export class MdePopover implements MdePopoverPanel, OnDestroy { // tslint:disabl
   @Input('mdePopoverArrowOffsetX')
   get arrowOffsetX(): number { return this._arrowOffsetX; }
   set arrowOffsetX(value: number) { this._arrowOffsetX = value; }
+
+  /** Popover arrow offset y */
+  @Input('mdePopoverArrowOffsetY')
+  get arrowOffsetY(): number { return this._arrowOffsetY; }
+  set arrowOffsetY(value: number) { this._arrowOffsetY = value; }
 
   /** Popover arrow width */
   @Input('mdePopoverArrowWidth')
@@ -273,29 +279,46 @@ export class MdePopover implements MdePopoverPanel, OnDestroy { // tslint:disabl
   // TODO: If arrow left and right positioning is requested, see if flex direction can be used to work with order.
   /** Sets the current styles for the popover to allow for dynamically changing settings */
   setCurrentStyles() {
+    
+    // If popover is at corner of trigger then arrow disabled and padding removed
+    if(this.positionX === 'after' || this.positionX === 'before'){
+      if(this.positionY === 'above' || this.positionY === 'below'){
+        this.popoverArrowStyles = {
+          'border': '0px'
+        }
+        this.popoverContentStyles = {
+          'padding': '0px'
+        }
+        return;
+      }
+    }
 
     // TODO: See if arrow position can be calculated automatically and allow override.
     // TODO: See if flex order is a better alternative to position arrow top or bottom.
     this.popoverArrowStyles = {
-      'right': this.positionX === 'before' ? (this.arrowOffsetX - this.arrowWidth) + 'px' : '',
-      'left': this.positionX === 'after' ? (this.arrowOffsetX - this.arrowWidth) + 'px' : '',
-      'border-top': this.positionY === 'below' ?
+      'right': this.getArrowRightStyle(),
+      'left': this.getArrowLeftStyle(),
+      'position': 'absolute',
+      'z-index': '99999',
+      'top': (this.positionY === 'center') ? `calc(50% - ${this.arrowOffsetY + this.arrowWidth}px)`: '',
+      'border-top': (this.positionY === 'center') ? 
+        this.arrowWidth + 'px solid transparent': this.positionY === 'below' ?
         this.arrowWidth + 'px solid ' + this.arrowColor : '0px solid transparent',
-      'border-right': 'undefined' === undefined ?
+      'border-right': (this.positionY === 'center' && this.positionX === 'after') ?
         this.arrowWidth + 'px solid ' + this.arrowColor :
         this.arrowWidth + 'px solid transparent',
       'border-bottom': this.positionY === 'above' ?
         this.arrowWidth + 'px solid ' + this.arrowColor :
         this.arrowWidth + 'px solid transparent',
-      'border-left': 'undefined' === undefined ?
+      'border-left': (this.positionY === 'center' && this.positionX === 'before') ?
         this.arrowWidth + 'px solid ' + this.arrowColor :
         this.arrowWidth + 'px solid transparent',
     };
 
     // TODO: Remove if flex order is added.
     this.popoverContentStyles = {
-      'padding-top': this.overlapTrigger === true ? '0px' : this.arrowWidth + 'px',
-      'padding-bottom': this.overlapTrigger === true ? '0px' : (this.arrowWidth) + 'px',
+      'padding': this.overlapTrigger === true ? '0px' : this.arrowWidth + 'px',
+      // 'padding-bottom': this.overlapTrigger === true ? '0px' : (this.arrowWidth) + 'px',
       'margin-top': this.overlapTrigger === false && this.positionY === 'below' && this.containerPositioning === false ?
         -(this.arrowWidth * 2) + 'px' : '0px'
     };
@@ -310,5 +333,37 @@ export class MdePopover implements MdePopoverPanel, OnDestroy { // tslint:disabl
     this._classList['mde-popover-after'] = posX === 'after';
     this._classList['mde-popover-above'] = posY === 'above';
     this._classList['mde-popover-below'] = posY === 'below';
+    this._classList['mde-popover-center'] = posX === 'center' || posY === 'center'
+  }
+
+  getArrowLeftStyle() {
+    if(this.positionX === 'center' && (this.positionY === 'above' || this.positionY === 'below')){
+      return `calc(50% + ${this.arrowOffsetX - this._arrowWidth}px)`
+    }
+    else if (this.positionX === 'after') {
+      if(this.positionY === 'center'){
+        return -this.arrowWidth + 'px'
+      }
+      else {
+        return (this.arrowOffsetX + this.arrowWidth) + 'px'
+      }
+    }
+    else {
+      return ''
+    }
+  }
+
+  getArrowRightStyle() {
+    if(this.positionX === 'before'){
+      if(this.positionY === 'center') {
+        return -this.arrowWidth + 'px';
+      }
+      else {
+        return (this.arrowOffsetX + this.arrowWidth) + 'px'
+      }
+    }
+    else {
+      return '';
+    }
   }
 }
