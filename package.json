@@ -1,35 +1,37 @@
 {
   "name": "popover",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:prod": "ng build material-extended --configuration production",
+    "build-demo": "ng build popper-test2 --configuration production",
+    "build:prod": "ng build @muntazir/material-extended --configuration production",
     "build:pack": "ng-packagr -p ./projects/muntazir/material-extended/ng-package.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^16.0.0",
-    "@angular/cdk": "^16.0.2",
-    "@angular/common": "^16.0.0",
-    "@angular/compiler": "^16.0.0",
-    "@angular/core": "^16.0.0",
-    "@angular/forms": "^16.0.0",
-    "@angular/material": "^16.0.2",
-    "@angular/platform-browser": "^16.0.0",
-    "@angular/platform-browser-dynamic": "^16.0.0",
-    "@angular/router": "^16.0.0",
+    "@angular/animations": "^17.0.6",
+    "@angular/cdk": "^17.0.3",
+    "@angular/common": "^17.0.6",
+    "@angular/compiler": "^17.0.6",
+    "@angular/core": "^17.0.6",
+    "@angular/forms": "^17.0.6",
+    "@angular/material": "^17.0.3",
+    "@angular/platform-browser": "^17.0.6",
+    "@angular/platform-browser-dynamic": "^17.0.6",
+    "@angular/router": "^17.0.6",
+    "angular-cli-ghpages": "^1.0.7",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.13.0"
+    "zone.js": "~0.14.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^16.0.3",
-    "@angular/cli": "~16.0.3",
-    "@angular/compiler-cli": "^16.0.0",
+    "@angular-devkit/build-angular": "^17.0.6",
+    "@angular/cli": "~17.0.6",
+    "@angular/compiler-cli": "^17.0.6",
     "@types/jasmine": "~4.3.0",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
@@ -37,7 +39,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
-    "ng-packagr": "^16.0.0",
-    "typescript": "~5.0.2"
+    "ng-packagr": "^17.0.2",
+    "typescript": "~5.2.2"
   }
 }
