@@ -8,6 +8,7 @@
     "build-demo": "ng build popper-test2 --configuration production",
     "build:prod": "ng build @muntazir/material-extended --configuration production",
     "build:pack": "ng-packagr -p ./projects/muntazir/material-extended/ng-package.json",
+    "publish": "npm run build:prod && npm publish --access public ./dist/muntazir/material-extended",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
