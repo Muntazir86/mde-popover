@@ -120,6 +120,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy { // tslint:d
   /** Disables popover trigger */
   @Input('mdeDisablePopoverTrigger') disablePopoverTrigger: boolean = false;
 
+  /** Popver container close on click of trigger, when trigger event is click */
+  @Input('mdePopoverCloseOnClickTrigger') closeOnClickTrigger: boolean = true;
+
   /** Event emitted when the associated popover is opened. */
   @Output() opened = new EventEmitter<void>();
 
@@ -196,6 +199,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy { // tslint:d
     if (this.closeOnClick === true || this.closeOnClick === false) {
       this.popover.closeOnClick = this.closeOnClick;
     }
+    if (!this.closeOnClickTrigger && this.triggerEvent === 'click' && this.backdropCloseOnClick){
+      this._elementRef.nativeElement.style.zIndex = "999999";
+    }
 
     this.popover.setCurrentStyles();
   }
@@ -207,7 +213,12 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy { // tslint:d
   @HostListener('click', ['$event'])
   onClick(event: MouseEvent): void {
     if (this.popover.triggerEvent === 'click') {
-      this.togglePopover();
+      if(this.closeOnClickTrigger){
+        this.togglePopover();
+      }
+      else if(!this._popoverOpen) {
+        this.togglePopover();
+      }
     }
   }
 
@@ -262,6 +273,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy { // tslint:d
     if (this._overlayRef) {
       this._overlayRef.detach();
       this._resetPopover();
+      if(!this.closeOnClickTrigger && this.triggerEvent === 'click'){
+        this._elementRef.nativeElement.blur()
+      }
     }
   }
 
