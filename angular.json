@@ -73,7 +73,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kb",
-                  "maximumError": "2mb"
+                  "maximumError": "1mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -98,10 +98,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "popper-test2:build:production"
+              "browserTarget": "popper-test2:build:production"
             },
             "development": {
-              "buildTarget": "popper-test2:build:development"
+              "browserTarget": "popper-test2:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -109,7 +109,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "popper-test2:build"
+            "browserTarget": "popper-test2:build"
           }
         },
         "test": {
@@ -130,9 +130,6 @@
             ],
             "scripts": []
           }
-        },
-        "deploy": {
-          "builder": "angular-cli-ghpages:deploy"
         }
       }
     }

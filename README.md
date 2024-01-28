@@ -3,25 +3,20 @@
 ![npm (scoped)](https://img.shields.io/npm/v/%40muntazir86/material-extended?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40muntazir86%2Fmaterial-extended)
 
 #### Links
-[Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) | 
+[Popover Demo](https://uixd.co.uk/open-source-software/material-extended/demo) | [StackBlitz Template](https://stackblitz.com/edit/mde-popover) | 
 [Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md)
 
 
 
 ### Project status
-Angular Popover is production ready.
+Angular Popover is production ready. This package supports angular v16.
 
 This was originally created as an example for a `@angular/material` issue feature request.
 Issue can be found at [angular/material2#2691](https://github.com/angular/material2/issues/2691)
 
 If you'd like to contribute please create an issue or pull request.
 
-### Version Compatibility
 
-| Angular Version | Package Compatibility |
-| --------------- | ---------------------- |
-| 16.x            | 5.x           |
-| 17.x            | 6.x           |
 
 ### Examples
 
@@ -109,8 +104,8 @@ mdePopoverTriggerOn="click">
 ##### Properties
 | **Name**                                                             | **Description**                                                                                                                                                                                                                       |
 |----------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @Input('mdePopoverPositionX') positionX                              | Position of the popover in the X axis. Type: string, Values:  'start' \|\| 'end' \|\| 'before' \|\| 'after' \|\| 'center', Default:  'after'.                                                                                                 |
-| @Input('mdePopoverPositionY') positionY                              | Position of the popover in the Y axis. Type: string, Values:  'start' \|\| 'end' \|\| 'above' \|\| 'below' \|\| 'center', Default:  'below'                                                                                                   |
+| @Input('mdePopoverPositionX') positionX                              | Position of the popover in the X axis. Type: string, Values:  'start' || 'end' || 'before' || 'after' || 'center', Default:  'after'.                                                                                                 |
+| @Input('mdePopoverPositionY') positionY                              | Position of the popover in the Y axis. Type: string, Values:  'start' || 'end' || 'above' || 'below' || 'center', Default:  'below'                                                                                                   |
 | @Input('mdePopoverTriggerOn') triggerEvent                           | Event for triggering popover 'click', 'hover' and 'none'. Default: hover                                                                                                                                                              |
 | @Input('mdePopoverEnterDelay') enterDelay                            | Delay for popover before enters, Type: number, Default:  200                                                                                                                                                                          |
 | @Input('mdePopoverLeaveDelay') leaveDelay                            | Delay for popover before leaves, Type: number, Default:  200                                                                                                                                                                          |
