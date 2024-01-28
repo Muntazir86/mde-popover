@@ -166,6 +166,7 @@ This directive is intended to be used in conjunction with an mde-popover tag. It
 | @Input('mdePopoverArrowWidth') arrowWidth                     | Arrow width in pixels. Type: number, Default: 8                                                                  |
 | @Input('mdePopoverArrowColor') arrowColor                     | Arrow color, accepts CSS color values. Default: rgba(0, 0, 0, 0.12)                     |
 | @Input('mdePopoverCloseOnClick') closeOnClick                 | Whether the popover should close on click. Type: boolean, Default: true.                                              |
+| @Input('mdePopoverCloseOnClickTrigger') closeOnClickTrigger                 | Whether the popover should close on click of trigger when click event is 'click'. Type: boolean, Default: true.                                              |
 | @Input('mdePopoverBackdropCloseOnClick') backdropCloseOnClick | Whether the popover should close on backdrop click. Type: boolean, Default: true.                                    |
 | @Output() opened                                              | Event emitted when the associated popover is opened.                                    |
 | @Output() closed                                              | Event emitted when the associated popover is closed.                                    |
