@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,32 +25,25 @@ import { SupportComponent } from './shared/components/support/support.component'
 import { ErrorModule } from './pages/error/error.module';
 
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    ThemePickerComponent,
-    NotificationsComponent,
-    GithubComponent,
-    SupportComponent,
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    ReactiveFormsModule,
-    HttpClientModule,
-    MatToolbarModule,
-    MatTabsModule,
-    MatCardModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MdePopoverModule,
-    AppRoutingModule,
-    PagesModule,
-    ErrorModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        ThemePickerComponent,
+        NotificationsComponent,
+        GithubComponent,
+        SupportComponent,
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatToolbarModule,
+        MatTabsModule,
+        MatCardModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        MdePopoverModule,
+        AppRoutingModule,
+        PagesModule,
+        ErrorModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule { }

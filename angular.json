@@ -48,11 +48,12 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/popper-test2",
+            "outputPath": {
+              "base": "dist/popper-test2"
+            },
             "index": "projects/popper-test2/src/index.html",
-            "main": "projects/popper-test2/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -65,7 +66,8 @@
             "styles": [
               "projects/popper-test2/src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "browser": "projects/popper-test2/src/main.ts"
           },
           "configurations": {
             "production": {
@@ -84,9 +86,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
