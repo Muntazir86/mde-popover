@@ -7,7 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
+import { MatFormField, MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
@@ -23,6 +23,9 @@ import { NotificationsComponent } from './shared/components/notifications/notifi
 import { GithubComponent } from './shared/components/github/github.component';
 import { SupportComponent } from './shared/components/support/support.component';
 import { ErrorModule } from './pages/error/error.module';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import {MatListModule} from '@angular/material/list';
 
 
 @NgModule({ declarations: [
@@ -31,6 +34,7 @@ import { ErrorModule } from './pages/error/error.module';
         NotificationsComponent,
         GithubComponent,
         SupportComponent,
+        // MdePopoverTarget
     ],
     bootstrap: [AppComponent], imports: [BrowserModule,
         BrowserAnimationsModule,
@@ -42,8 +46,12 @@ import { ErrorModule } from './pages/error/error.module';
         MatInputModule,
         MatButtonModule,
         MatIconModule,
+        MatSelectModule,
+        MatFormFieldModule,
+        MatListModule,
         MdePopoverModule,
         AppRoutingModule,
         PagesModule,
-        ErrorModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
+        ErrorModule
+    ], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule { }
