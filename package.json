@@ -5,10 +5,11 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build-demo": "ng build popper-test2 --configuration production",
+    "build-demo": "ng build popper-test --configuration production",
     "build:prod": "ng build @muntazir/material-extended --configuration production",
     "build:pack": "ng-packagr -p ./projects/muntazir/material-extended/ng-package.json",
     "publish": "npm run build:prod && npm publish --access public ./dist/muntazir/material-extended",
+    "deploy": "ng deploy --base-href=/mde-popover/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -24,7 +25,7 @@
     "@angular/platform-browser": "^18.0.4",
     "@angular/platform-browser-dynamic": "^18.0.4",
     "@angular/router": "^18.0.4",
-    "angular-cli-ghpages": "^1.0.7",
+    "angular-cli-ghpages": "^2.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.2"
