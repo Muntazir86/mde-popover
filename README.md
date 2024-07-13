@@ -4,7 +4,7 @@
 
 #### Links
 [Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) | 
-[Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md)
+[Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md) | [npm](https://www.npmjs.com/package/@muntazir86/material-extended)
 
 
 
@@ -20,8 +20,10 @@ If you'd like to contribute please create an issue or pull request.
 
 | Angular Version | Package Compatibility |
 | --------------- | ---------------------- |
-| 16.x            | 5.x           |
+| 18.x            | 7.x           |
 | 17.x            | 6.x           |
+| 16.x            | 5.x           |
+
 
 ### Examples
 
