@@ -1,4 +1,4 @@
-<mat-toolbar color="primary" #mainToolbar>
+<mat-toolbar color="primary" #mainToolbar="mdePopoverTarget" mdePopoverTarget>
   <button mat-button [mdePopoverTriggerFor]="popover" mdePopoverTriggerOn="click">Click Me</button>
 
   <div class="fill"></div>
@@ -7,14 +7,13 @@
     <mat-icon>format_color_fill</mat-icon>
   </button>
 
-  
   <button mat-icon-button [mdePopoverTriggerFor]="notificationsPopover" [mdePopoverTargetAt]="mainToolbar" mdePopoverTriggerOn="click">
     <mat-icon>notifications</mat-icon>
   </button>
  
 
   <button mat-icon-button [mdePopoverTriggerFor]="githubPopover" [mdePopoverTargetAt]="mainToolbar" mdePopoverTriggerOn="hover">
-    <img src="../assets/images/github-circle-white-transparent.svg">
+    <img src="assets/images/github-circle-white-transparent.svg">
   </button>
 </mat-toolbar>
 

@@ -1,0 +1,14 @@
+:host {
+  background-color: #e5e5e5;
+  width: 400px;
+}
+
+.example-card {
+  max-width: 400px;
+  width: 300px;
+  padding: 16px;
+}
+
+::ng-deep .mat-mdc-tab-group {
+  box-shadow: none;
+}

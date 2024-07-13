@@ -32,7 +32,35 @@ export class ThemePickerComponent implements OnInit {
         'background-color': '#3f51b5',
         'background': '-webkit-linear-gradient(-45deg, #3f51b5 0%, #3f51b5 50%, #9e9e9e 51%, #9e9e9e 100%)'
       }
-    }
+    },
+    // {
+    //   className: 'purple-green-theme',
+    //   styles: {
+    //     'background-color': '#2196f3',
+    //     'background': '-webkit-linear-gradient(-45deg, #7b1fa2 0%, #7b1fa2 50%, #69f0ae 51%, #69f0ae 100%)'
+    //   }
+    // },
+    // {
+    //   className: 'indigo-pink-theme',
+    //   styles: {
+    //     'background-color': '#2196f3',
+    //     'background': '-webkit-linear-gradient(-45deg, #3f51b5 0%, #3f51b5 50%, #ff4081 51%, #ff4081 100%)'
+    //   }
+    // },
+    // {
+    //   className: 'pink-bluegrey-theme',
+    //   styles: {
+    //     'background-color': '#e91e63',
+    //     'background': '-webkit-linear-gradient(-45deg, #e91e63 0%, #e91e63 50%, #bdbdbd 51%, #bdbdbd 100%)'
+    //   }
+    // },
+    // {
+    //   className: 'cyan-orange-theme',
+    //   styles: {
+    //     'background-color': '#00000',
+    //     'background': '-webkit-linear-gradient(-45deg, #e91e63 0%, #e91e63 50%, #bdbdbd 51%, #bdbdbd 100%)'
+    //   }
+    // },
   ];
 
   /*

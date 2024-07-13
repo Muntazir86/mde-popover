@@ -1,14 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
-.purple-green-theme {
-    @import '@angular/material/prebuilt-themes/indigo-pink.css';
-}
+@use '@angular/material' as mat;
+@include mat.core();
 
+@import './app/core/themes/indigo-pink';
 @import './app/core/themes/deeppurple-amber';
 @import './app/core/themes/pink-bluegrey';
 @import './app/core/themes/pink-grey';
-@import './app/core/themes/indigo-pink';
 @import './app/core/themes/indigo-grey';
 @import './app/core/themes/purple-green';
+@import './app/core/themes/cyan-orange';
 
 
 
@@ -20,6 +20,8 @@ body {
     margin: 0;
 }
 
-page-home {
-    min-height: 200vh;
+.pink-grey-theme {
+    .example-card {
+        color: white;
+    }
 }

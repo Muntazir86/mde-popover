@@ -130,19 +130,13 @@ export class GithubComponent implements OnInit, AfterViewInit {
     };
   }
 
-  ngAfterViewInit2() {
-
-  }
   ngAfterViewInit() {
 
-
-
-
-    this._http.get('https://api.github.com/repos/material-extended/mde').subscribe((details: any) => {
-      console.log(details);
-      this.details = details;
-      // alert(details.json());
-    });
+    // this._http.get('https://api.github.com/repos/material-extended/mde').subscribe((details: any) => {
+    //   console.log(details);
+    //   this.details = details;
+    //   // alert(details.json());
+    // });
 
 
     /*

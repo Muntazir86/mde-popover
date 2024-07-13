@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  max-width: 250px;
+  // width: 240px;
+  background-color: #ffffff;
+  // min-height: 100px;
+  padding: 10px;
+}
+
+
+
+.github-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+.repo-link {
+  background-color: #1976d2; /* Blue */
+}
+
+.issues-link {
+  background-color: #d32f2f; /* Red */
+}
+
+.icon {
+  vertical-align: middle;
+  margin-right: 5px;
+}
