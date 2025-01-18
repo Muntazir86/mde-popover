@@ -1,0 +1,31 @@
+{
+  "name": "@muntazir/material-extended",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/@muntazir/material-extended/src",
+  "prefix": "lib",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:package",
+      "options": {
+        "project": "libs/@muntazir/material-extended/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/@muntazir/material-extended/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/@muntazir/material-extended/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@angular-devkit/build-angular:karma",
+      "options": {
+        "tsConfig": "libs/@muntazir/material-extended/tsconfig.spec.json",
+        "polyfills": ["zone.js", "zone.js/testing"]
+      }
+    }
+  }
+}
