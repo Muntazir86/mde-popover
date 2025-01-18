@@ -3,10 +3,9 @@
 ![npm (scoped)](https://img.shields.io/npm/v/%40muntazir86/material-extended?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40muntazir86%2Fmaterial-extended)
 
 #### Links
-[Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) | 
+
+[Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) |
 [Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md) | [npm](https://www.npmjs.com/package/@muntazir86/material-extended)
-
-
 
 ### Project status
 
@@ -20,11 +19,10 @@ If you'd like to contribute please create an issue or pull request.
 ### Version Compatibility
 
 | Angular Version | Package Compatibility |
-| --------------- | ---------------------- |
-| 18.x            | 7.x           |
-| 17.x            | 6.x           |
-| 16.x            | 5.x           |
-
+| --------------- | --------------------- |
+| 18.x            | 7.x                   |
+| 17.x            | 6.x                   |
+| 16.x            | 5.x                   |
 
 ### Examples
 
@@ -197,4 +195,3 @@ MIT © [Joe Jordan Brown](https://github.com/joejordanbrown)
 [Angular Popover by UIXD](https://uixd.co.uk)
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover?ref=badge_large)
-

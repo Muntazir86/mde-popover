@@ -1,0 +1,97 @@
+{
+  "name": "popper-test",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "generators": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
+  "sourceRoot": "apps/popper-test/src",
+  "prefix": "app",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "options": {
+        "outputPath": "dist/apps/popper-test",
+        "baseHref": "/mde-popover/",
+        "index": "apps/popper-test/src/index.html",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/popper-test/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          "apps/popper-test/src/favicon.ico",
+          "apps/popper-test/src/assets"
+        ],
+        "styles": ["apps/popper-test/src/styles.scss"],
+        "scripts": [],
+        "browser": "apps/popper-test/src/main.ts"
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "2mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "popper-test:build:production"
+        },
+        "development": {
+          "buildTarget": "popper-test:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "popper-test:build"
+      }
+    },
+    "test": {
+      "executor": "@angular-devkit/build-angular:karma",
+      "options": {
+        "polyfills": ["zone.js", "zone.js/testing"],
+        "tsConfig": "apps/popper-test/tsconfig.spec.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          "apps/popper-test/src/favicon.ico",
+          "apps/popper-test/src/assets"
+        ],
+        "styles": ["apps/popper-test/src/styles.scss"],
+        "scripts": []
+      }
+    },
+    "deploy": {
+      "executor": "angular-cli-ghpages:deploy",
+      "options": {
+        "repo": "https://github.com/Muntazir86/mde-popover.git",
+        "branch": "gh-pages",
+        "name": "Ghulam Shabbir",
+        "email": "ghulamshabbirmtn500@gmail.com"
+      }
+    }
+  }
+}

@@ -3,15 +3,16 @@
   "version": "7.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "build-demo": "ng build popper-test --configuration production",
-    "build:prod": "ng build @muntazir/material-extended --configuration production",
-    "build:pack": "ng-packagr -p ./projects/muntazir/material-extended/ng-package.json",
+    "start": "nx serve popper-test",
+    "build": "nx build",
+    "lint": "nx lint",
+    "build-demo": "nx build popper-test --configuration production",
+    "build:prod": "nx build @muntazir/material-extended --configuration production",
+    "build:pack": "ng-packagr -p libs/muntazir/material-extended/ng-package.json",
     "publish": "npm run build:prod && npm publish --access public ./dist/muntazir/material-extended",
-    "deploy": "ng deploy --base-href=/mde-popover/",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "deploy": "nx deploy --base-href=/mde-popover/",
+    "watch": "nx build --watch --configuration development",
+    "test": "nx test"
   },
   "private": true,
   "dependencies": {
@@ -32,9 +33,19 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.0.5",
+    "@angular-devkit/core": "~18.0.5",
+    "@angular-devkit/schematics": "~18.0.5",
     "@angular/cli": "~18.0.5",
     "@angular/compiler-cli": "^18.0.4",
+    "@nx/angular": "19.6.5",
+    "@nx/js": "19.6.5",
+    "@nx/workspace": "19.6.5",
+    "@schematics/angular": "~18.0.5",
+    "@swc-node/register": "~1.9.1",
+    "@swc/core": "~1.5.7",
+    "@swc/helpers": "~0.5.11",
     "@types/jasmine": "~4.3.0",
+    "autoprefixer": "^10.4.0",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -42,6 +53,10 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
     "ng-packagr": "^18.0.0",
+    "nx": "19.6.5",
+    "postcss": "^8.4.5",
+    "postcss-url": "~10.1.3",
+    "prettier": "^2.6.2",
     "typescript": "~5.4.5"
   }
 }

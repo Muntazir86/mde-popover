@@ -1,86 +1,4 @@
-# Angular Popover
-
-![npm (scoped)](https://img.shields.io/npm/v/%40muntazir86/material-extended?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40muntazir86%2Fmaterial-extended)
-
-#### Links
-[Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) | 
-[Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md) | [npm](https://www.npmjs.com/package/@muntazir86/material-extended)
-
-
-
-### Project status
-
-Angular Popover is production ready.
-
-This was originally created as an example for a `@angular/material` issue feature request.
-Issue can be found at [angular/material2#2691](https://github.com/angular/material2/issues/2691)
-
-If you'd like to contribute please create an issue or pull request.
-
-### Version Compatibility
-
-| Angular Version | Package Compatibility |
-| --------------- | ---------------------- |
-| 18.x            | 7.x           |
-| 17.x            | 6.x           |
-| 16.x            | 5.x           |
-
-
-### Examples
-
-**Material theme picker**
-
-[![Material theme picker](https://media.giphy.com/media/jsxheZJXN1346GD5St/giphy.gif)](https://stackblitz.com/edit/angular-popover-demo)
-
-**Standard popover**
-
-![image](https://cloud.githubusercontent.com/assets/10200431/22394189/02e9b21e-e511-11e6-9f91-c6b470a6b212.png)
-
-![image](https://cloud.githubusercontent.com/assets/10200431/22394186/e21a235c-e510-11e6-9cde-948b1a4382bc.png)
-
-**Google+ style popover**
-
-![image](https://cloud.githubusercontent.com/assets/10200431/22397870/4f27ddba-e573-11e6-943f-2d737b59d39e.png)
-
-### Installation
-
-Install npm package using:
-
-`npm install @muntazir86/material-extended`
-
-Install required packages @angular/cdk
-
-`yarn add @angular/cdk`
-or
-`npm install @angular/cdk`
-
-### Initial setup
-
-The CDK overlays depend on a small set of structural styles to work correctly. If you're using Angular Material, these styles have been included together with the theme, otherwise if you're using the CDK on its own, you'll have to include the styles yourself. You can do so by importing the prebuilt styles in your global stylesheet:
-
-@import '@angular/cdk/overlay-prebuilt.css';
-
-### Import module
-
-app.module.ts
-
-```typescript
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-
-import { AppComponent } from './app.component';
-import { MdePopoverModule } from '@muntazir86/material-extended';
-
-@NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule, MdePopoverModule],
-  providers: [],
-  bootstrap: [AppComponent],
-})
-export class AppModule {}
-```
-
-### Usage
+# mde-popover
 
 `<mde-popover>` is a floating panel containing html content.
 
@@ -93,10 +11,140 @@ via application of the `mdePopoverTriggerFor` directive:
   <button md-button>Help</button>
 </mde-popover>
 
-<button md-button [mdePopoverTriggerFor]="appPopover" mdePopoverTriggerOn="click">
+<button md-button [mdePopoverTriggerFor]="appPopover">
   <md-icon>more_vert</md-icon>
 </button>
 ```
+
+### Toggling the popover programmatically
+
+The popover exposes an API to open/close programmatically. Please note that in this case, an
+`mdePopoverTriggerFor` directive is still necessary to attach the popover to a trigger element in the DOM.
+You can disable the default triggerEvent by setting to `none`.
+
+```ts
+class MyComponent {
+  @ViewChild(MdePopoverTrigger) trigger: MdePopoverTrigger;
+
+  someMethod() {
+    this.trigger.togglePopover();
+  }
+}
+```
+
+### Customizing popover position
+
+By default, the popover will display below (y-axis), after (x-axis), and overlapping its trigger. The position can be changed
+using the `mdePopoverPositionX` (` before | after |start | end | center`) and `mdePopoverPositionY` (` above | below | start | end | center`) attributes.
+The popover can be forced to not overlap the trigger using `[mdePopoverOverlapTrigger]="false"` attribute.
+
+```html
+<mde-popover #appPopover="mdePopover" mdePopoverPositionY="above">
+  <button md-button>Close</button>
+</mde-popover>
+
+<button md-button [mdePopoverTriggerFor]="appPopover">
+  <md-icon>more_vert</md-icon>
+</button>
+```
+
+### Disabling the Trigger
+
+The trigger element can be disabled using the attribute `[disabled]`.
+If the element doesn't nativly support the disabled attribute,
+you will need to apply the following CSS to add that functionality to the element.
+This will be required to support the usage of disabled on elements such as `a, div, custom-element`.
+
+```css
+/* Elements with disabled attribute will have pointer events disabled */
+[disabled] {
+  pointer-events: none;
+}
+
+/* This prevents it from being disabled when it has the disabled attribute with a value of false. */
+[disabled='false'] {
+  pointer-events: initial;
+}
+```
+
+### Popover position target reference
+
+The popover positioning by default is calculated from the trigger element.
+You can override positioning by referencing another component `[mdePopoverTargetAt]="templateRef"`.
+This allows you to have multiple popovers positioned in the same place. See example app [here](https://uixd.co.uk/open-source-software/material-extended/demo).
+
+```html
+<mde-popover #appPopoverNotifications="mdePopover"> Notifcations </mde-popover>
+
+<mde-popover #appPopoverAccount="mdePopover">
+  <button md-button>Profile</button>
+  <button md-button>Logout</button>
+</mde-popover>
+
+<md-toolbar #appToolbar>
+  <button md-button [mdePopoverTriggerFor]="appPopoverNotifications" [mdePopoverTargetAt]="appToolbar">
+    <md-icon>notifications</md-icon>
+  </button>
+
+  <button md-button [mdePopoverTriggerFor]="appPopoverAccount" [mdePopoverTargetAt]="appToolbar">
+    <md-icon>face</md-icon>
+  </button>
+</md-toolbar>
+```
+
+### Popover position target native element with directive
+
+When targeting a native element or a component that doesn't expose the ElementRef.
+
+```html
+<mde-popover #appPopover1="mdePopover"> Popover one content. </mde-popover>
+
+<mde-popover #appPopover2="mdePopover"> Popover two content. </mde-popover>
+
+<div mdePopoverTarget #appElement="mdePopoverTarget">
+  <button md-button [mdePopoverTriggerFor]="appPopover1" [mdePopoverTargetAt]="appElement">Show Popover one</button>
+
+  <button md-button [mdePopoverTriggerFor]="appPopover2" [mdePopoverTargetAt]="appElement">Show Popover two</button>
+</div>
+```
+
+### Popover position target with mde-popover-target component
+
+You can use the `<mde-popover-target>` as the target reference.
+
+```html
+<mde-popover #appPopover1="mdePopover"> Popover one content. </mde-popover>
+
+<mde-popover #appPopover2="mdePopover"> Popover two content. </mde-popover>
+
+<mde-popover-target #appElement="mdePopoverTarget">
+  <button md-button [mdePopoverTriggerFor]="appPopover1" [mdePopoverTargetAt]="appElement">Show Popover one</button>
+
+  <button md-button [mdePopoverTriggerFor]="appPopover2" [mdePopoverTargetAt]="appElement">Show Popover two</button>
+</mde-popover-target>
+```
+
+### Popover FocusTrap
+
+The popover uses `cdkTrapFocus` to trap focus within the popover, by default this is enabled.
+The popover can be be forced to not focus trap using `[mdeFocusTrapEnabled]="false"` attribute.
+
+```html
+<mde-popover #appPopoverAccount="mdePopover" [mdeFocusTrapEnabled]="false">
+  <button md-button>Profile</button>
+  <button md-button>Logout</button>
+</mde-popover>
+
+<button md-button [mdePopoverTriggerFor]="appPopoverAccount">
+  <md-icon>face</md-icon>
+</button>
+```
+
+### Keyboard interaction
+
+- <kbd>TAB</kbd>: Focus next element
+- <kbd>SHIFT</kbd> + <kbd>TAB</kbd>: Focus previous element
+- <kbd>ESC</kbd>: Exit popover
 
 # API reference
 
@@ -183,18 +231,3 @@ Closes the popover.
 
 `destroyPopover`
 Removes the popover from the DOM.
-
-### Issues
-
-Please report bugs and issues [here](https://github.com/Muntazir86/mde-popover/issues).
-
-###
-
-### License
-
-MIT © [Joe Jordan Brown](https://github.com/joejordanbrown)
-
-[Angular Popover by UIXD](https://uixd.co.uk)
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover?ref=badge_large)
-
