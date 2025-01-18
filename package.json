@@ -10,7 +10,7 @@
     "build:prod": "nx build @muntazir/material-extended --configuration production",
     "build:pack": "ng-packagr -p libs/muntazir/material-extended/ng-package.json",
     "publish": "npm run build:prod && npm publish --access public ./dist/muntazir/material-extended",
-    "deploy": "nx deploy --base-href=/mde-popover/",
+    "deploy": "nx run popper-test:deploy --base-href=/mde-popover/",
     "watch": "nx build --watch --configuration development",
     "test": "nx test"
   },
