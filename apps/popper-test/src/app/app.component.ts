@@ -4,9 +4,10 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 export const DEFAULT_THEME = 'deeppurple-amber-theme';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent {
   @HostBinding('class') _themeClass: string = DEFAULT_THEME;

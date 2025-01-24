@@ -7,9 +7,10 @@ import {
 } from '@muntazir/material-extended';
 
 @Component({
-  selector: 'app-builder',
-  templateUrl: './builder.component.html',
-  styleUrls: ['./builder.component.scss'],
+    selector: 'app-builder',
+    templateUrl: './builder.component.html',
+    styleUrls: ['./builder.component.scss'],
+    standalone: false
 })
 export class PageExamplesBuilderComponent {
   alignButton = 'align-left';
