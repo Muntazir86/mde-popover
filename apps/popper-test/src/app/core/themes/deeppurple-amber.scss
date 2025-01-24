@@ -20,7 +20,8 @@ $theme: m2.define-light-theme(
 
 .deeppurple-amber-theme {
   // Emit theme-dependent styles for common features used across multiple components.
-  @include mat.core-theme($theme);
+  @include mat.elevation-classes();
+  @include mat.app-background();
 
   // Include the theme mixins for other components you use here.
   @include mat.all-component-themes($theme);

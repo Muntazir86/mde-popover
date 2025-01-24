@@ -3,9 +3,10 @@ import { AfterViewInit, Component, HostBinding, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-github',
-  templateUrl: './github.component.html',
-  styleUrls: ['./github.component.scss'],
+    selector: 'app-github',
+    templateUrl: './github.component.html',
+    styleUrls: ['./github.component.scss'],
+    standalone: false
 })
 export class GithubComponent implements OnInit, AfterViewInit {
   @HostBinding('class.mat-elevation-z4') elevation = true;

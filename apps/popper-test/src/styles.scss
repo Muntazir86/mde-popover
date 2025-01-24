@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
-@include mat.core();
+@include mat.elevation-classes();
+@include mat.app-background();
 
 @import './app/core/themes/indigo-pink';
 @import './app/core/themes/deeppurple-amber';
