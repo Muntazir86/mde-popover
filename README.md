@@ -21,6 +21,7 @@ If you'd like to contribute please create an issue or pull request.
 
 | Angular Version | Package Compatibility |
 | --------------- | ---------------------- |
+| 19.x            | 8.x           |
 | 18.x            | 7.x           |
 | 17.x            | 6.x           |
 | 16.x            | 5.x           |
