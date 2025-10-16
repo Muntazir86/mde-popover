@@ -1,0 +1,35 @@
+@use '@angular/material' as mat;
+
+// M3-compliant toolbar theming mixin
+@mixin toolbar-theme($theme) {
+  // Get the primary color from the theme
+  $primary-color: mat.get-theme-color($theme, primary);
+  $primary-container: mat.get-theme-color($theme, primary-container);
+  $on-primary: mat.get-theme-color($theme, on-primary);
+  $on-primary-container: mat.get-theme-color($theme, on-primary-container);
+  
+  // Apply primary color to toolbar when color="primary" is used
+  mat-toolbar {
+    &[color="primary"] {
+      background-color: $primary-container;
+      color: $on-primary-container;
+      
+      // Style icons and buttons within the toolbar
+      .mat-icon,
+      .mat-mdc-icon-button {
+        color: $on-primary-container;
+      }
+    }
+    
+    // For a more prominent primary look (like the old M2 behavior)
+    &.mat-primary-strong {
+      background-color: $primary-color;
+      color: $on-primary;
+      
+      .mat-icon,
+      .mat-mdc-icon-button {
+        color: $on-primary;
+      }
+    }
+  }
+}

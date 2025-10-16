@@ -1,15 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
-@include mat.elevation-classes();
-@include mat.app-background();
 
-@import './app/core/themes/indigo-pink';
-@import './app/core/themes/deeppurple-amber';
-@import './app/core/themes/pink-bluegrey';
-@import './app/core/themes/pink-grey';
-@import './app/core/themes/indigo-grey';
-@import './app/core/themes/purple-green';
-@import './app/core/themes/cyan-orange';
+// Import theme files using @use instead of @import
+@use './app/core/themes/indigo-pink';
+@use './app/core/themes/deeppurple-amber';
+@use './app/core/themes/pink-bluegrey';
+@use './app/core/themes/pink-grey';
+@use './app/core/themes/indigo-grey';
+@use './app/core/themes/purple-green';
+@use './app/core/themes/cyan-orange';
+@use './app/core/themes/custom-theme';
+
+// Include the core styles for Material 3
+@include mat.core();
 
 html,
 body {

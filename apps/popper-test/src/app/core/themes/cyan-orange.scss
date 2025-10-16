@@ -1,20 +1,29 @@
 @use '@angular/material' as mat;
+@use './toolbar-overrides' as toolbar;
 
-$theme: mat.define-theme(
-  (
-    color: (
-      theme-type: dark,
-      primary: mat.$cyan-palette,
-      tertiary: mat.$orange-palette,
-    ),
-    density: (
-      scale: 0,
-    ),
+// Define the theme using Material 3 (M3) approach - Dark theme
+$theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: mat.$cyan-palette,
+    tertiary: mat.$orange-palette,
+  ),
+  typography: (
+    plain-family: 'Roboto, sans-serif',
+    brand-family: 'Roboto, sans-serif',
+    bold-weight: 700,
+    medium-weight: 500,
+    regular-weight: 400,
+  ),
+  density: (
+    scale: 0
   )
-);
+));
 
 .cyan-orange-theme {
   @include mat.all-component-themes($theme);
+  // Enable backwards compatibility for color="primary" on components
   @include mat.color-variants-backwards-compatibility($theme);
-  @include mat.typography-hierarchy($theme);
+  // Apply custom toolbar theming
+  @include toolbar.toolbar-theme($theme);
 }
