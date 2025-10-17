@@ -1,12 +1,8 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
-  EventEmitter,
   HostBinding,
-  Input,
-  OnInit,
-  Output,
+  model,
 } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { NgStyle } from '@angular/common';
@@ -18,7 +14,7 @@ import { MatIcon } from '@angular/material/icon';
     styleUrls: ['./theme-picker.component.scss'],
     imports: [MatButton, NgStyle, MatIcon]
 })
-export class ThemePickerComponent implements OnInit {
+export class ThemePickerComponent {
   hovering: any = null;
 
   @HostBinding('class.mat-elevation-z4') elevation = true;
@@ -119,22 +115,20 @@ export class ThemePickerComponent implements OnInit {
 }
 */
 
-  themeValue = '';
-  @Output() themeChange = new EventEmitter();
+  // themeChange = output<string>();
+  theme = model<string>('');
+  
+  // themeSignal = signal<string>('');
 
-  @Input()
-  get theme() {
-    return this.themeValue;
-  }
+  // @Input()
+  // get theme() {
+  //   return this.themeValue;
+  // }
 
-  set theme(val) {
-    this.themeValue = val;
-    this.themeChange.emit(this.themeValue);
-  }
-
-  constructor() {}
-
-  ngOnInit() {}
+  // set theme(val) {
+  //   this.themeValue = val;
+  //   this.themeChange.emit(this.themeValue);
+  // }
 
   onItemKeydown(event, className = null) {
     const next = new ElementRef(event.nextSibling);

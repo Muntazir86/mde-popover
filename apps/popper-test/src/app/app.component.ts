@@ -11,7 +11,7 @@ import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card'
 import { SupportComponent } from './shared/components/support/support.component';
 import { RouterOutlet } from '@angular/router';
 
-export const DEFAULT_THEME = 'deeppurple-amber-theme';
+export const DEFAULT_THEME = 'indigo-pink-theme';
 
 @Component({
     selector: 'app-root',
