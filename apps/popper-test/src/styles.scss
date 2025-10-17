@@ -11,9 +11,11 @@
 @use './app/core/themes/cyan-orange';
 @use './app/core/themes/custom-theme';
 
+// Include Material core - REQUIRED for Material 3
+@include mat.core();
+
 // Include the core styles for Material 3
 @include mat.elevation-classes();
-@include mat.app-background();
 
 html,
 body {
@@ -22,10 +24,71 @@ body {
 
 body {
   margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  // Ensure body always has a light background for overlay purposes
+  background-color: #fafafa !important;
 }
 
-.pink-grey-theme {
-  .example-card {
-    color: white;
+// Dark theme specific styles
+.pink-grey-theme,
+.purple-green-theme,
+.pink-bluegrey-theme,
+.cyan-orange-theme,
+.custom-dark-theme {
+  // Apply dark background to main app area only
+  app-root {
+    display: block;
+    min-height: 100vh;
+    // Dark themes should have dark backgrounds
+    background-color: #121212;
+    color: rgba(255, 255, 255, 0.87);
+  }
+  
+  // Override Material Card colors for dark themes
+  .mat-mdc-card {
+    // Dark surface color for cards
+    background-color: #1e1e1e !important;
+    color: rgba(255, 255, 255, 0.87) !important;
+    
+    .mat-mdc-card-content,
+    .mat-mdc-card-title,
+    .mat-mdc-card-subtitle {
+      color: rgba(255, 255, 255, 0.87) !important;
+    }
+    
+    p, span, div {
+      color: rgba(255, 255, 255, 0.87) !important;
+    }
+  }
+  
+  // Ensure popover cards also have dark backgrounds
+  .mde-popover-panel,
+  .cdk-overlay-pane {
+    .mat-mdc-card {
+      background-color: #1e1e1e !important;
+      color: rgba(255, 255, 255, 0.87) !important;
+      
+      * {
+        color: inherit !important;
+      }
+    }
+  }
+  
+  // Ensure overlay backdrop is not affected
+  .cdk-overlay-backdrop {
+    background-color: transparent !important;
+  }
+  
+  // Overlay container should not have dark background
+  .cdk-overlay-container {
+    background-color: transparent !important;
+  }
+  
+  // Fix buttons in dark theme using Material 3 tokens
+  .mat-mdc-button,
+  .mat-mdc-raised-button {
+    &:not([color="primary"]):not([color="accent"]):not([color="warn"]) {
+      color: var(--mat-sys-on-surface);
+    }
   }
 }

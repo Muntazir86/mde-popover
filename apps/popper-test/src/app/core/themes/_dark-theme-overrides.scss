@@ -1,0 +1,25 @@
+@use '@angular/material' as mat;
+
+// Minimal mixin for dark theme support
+// Let Material 3 handle most of the theming automatically
+@mixin dark-theme-text-overrides() {
+  // Ensure the dark background is applied to the body
+  background-color: var(--mat-sys-background);
+  color: var(--mat-sys-on-background);
+  
+  // Only target plain text content that isn't part of Material components
+  // This preserves theme colors on buttons, cards, etc.
+  .demo-content,
+  .example-content,
+  .page-content {
+    p, span, div {
+      color: var(--mat-sys-on-background);
+    }
+  }
+  
+  // Fix specific elements that might need help
+  .example-card {
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
+  }
+}
