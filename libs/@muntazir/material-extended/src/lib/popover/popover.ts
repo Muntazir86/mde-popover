@@ -4,6 +4,7 @@ import {
   Input,
   OnDestroy,
   Output,
+  AnimationCallbackEvent,
   TemplateRef,
   ViewChild,
   ViewEncapsulation,
@@ -11,9 +12,9 @@ import {
   ChangeDetectionStrategy,
   HostBinding,
   NgZone,
+  inject,
 } from '@angular/core';
 
-import { AnimationEvent } from '@angular/animations';
 
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { ESCAPE } from '@angular/cdk/keycodes';
@@ -31,7 +32,6 @@ import {
   throwMdePopoverInvalidPositionY,
 } from './popover-errors';
 import { MdePopoverPanel } from './popover-interfaces';
-import { transformPopover } from './popover-animations';
 
 @Component({
     selector: 'mde-popover',
@@ -39,7 +39,6 @@ import { transformPopover } from './popover-animations';
     styleUrls: ['./popover.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
-    animations: [transformPopover],
     exportAs: 'mdePopover',
     standalone: false
 })
@@ -86,8 +85,11 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
   /** Config object to be passed into the popover's content ngStyle */
   public popoverContentStyles: {};
 
-  /** Emits the current animation state whenever it changes. */
-  _onAnimationStateChange = new EventEmitter<AnimationEvent>();
+  /** Emits when the enter animation completes. */
+  _onEnterAnimationComplete = new EventEmitter<void>();
+
+  /** Emits when the leave animation completes. */
+  _onLeaveAnimationComplete = new EventEmitter<void>();
 
   /** Position of the popover in the X axis. */
   @Input('mdePopoverPositionX')
@@ -302,7 +304,9 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
 
   @ViewChild(TemplateRef) templateRef!: TemplateRef<any>;
 
-  constructor(private _elementRef: ElementRef, public zone: NgZone) {
+  private _elementRef = inject(ElementRef);
+  public zone = inject(NgZone);
+  constructor() {
     this.setPositionClasses();
   }
 
@@ -454,5 +458,17 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
     } else {
       return '';
     }
+  }
+
+  /** Handles the enter animation completion */
+  onEnterAnimationComplete(event: AnimationCallbackEvent): void {
+    event.animationComplete();
+    this._onEnterAnimationComplete.emit();
+  }
+
+  /** Handles the leave animation completion */
+  onLeaveAnimationComplete(event: AnimationCallbackEvent): void {
+    event.animationComplete();
+    this._onLeaveAnimationComplete.emit();
   }
 }

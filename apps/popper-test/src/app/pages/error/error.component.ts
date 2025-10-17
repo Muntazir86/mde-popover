@@ -4,8 +4,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
     selector: 'page-error',
     templateUrl: './error.component.html',
     styleUrls: ['./error.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PageErrorComponent implements OnInit {
   constructor() {}

@@ -8,8 +8,8 @@ describe('PageErrorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [PageErrorComponent],
-    }).compileComponents();
+    imports: [PageErrorComponent],
+}).compileComponents();
   }));
 
   beforeEach(() => {

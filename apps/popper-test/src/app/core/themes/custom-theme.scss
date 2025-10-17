@@ -1,0 +1,62 @@
+@use '@angular/material' as mat;
+@use './toolbar-overrides' as toolbar;
+@use './theme-colors' as custom-colors;
+
+// Define the custom theme using Material 3 (M3) approach with custom palettes
+// Primary: #CA9577 (warm brown/terracotta)
+// Tertiary: #387A71 (teal/sea green)
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: custom-colors.$primary-palette,
+    tertiary: custom-colors.$tertiary-palette,
+  ),
+  typography: (
+    plain-family: 'Roboto, sans-serif',
+    brand-family: 'Roboto, sans-serif',
+    bold-weight: 700,
+    medium-weight: 500,
+    regular-weight: 400,
+  ),
+  density: (
+    scale: 0
+  )
+));
+
+// Include all theme styles for the components.
+.custom-theme {
+  @include mat.all-component-themes($theme);
+  // Enable backwards compatibility for color="primary" on components
+  @include mat.color-variants-backwards-compatibility($theme);
+  // Apply custom toolbar theming
+  @include toolbar.toolbar-theme($theme);
+}
+
+// Dark variant of the custom theme
+$dark-theme: mat.define-theme((
+  color: (
+    theme-type: dark,
+    primary: custom-colors.$primary-palette,
+    tertiary: custom-colors.$tertiary-palette,
+  ),
+  typography: (
+    plain-family: 'Roboto, sans-serif',
+    brand-family: 'Roboto, sans-serif',
+    bold-weight: 700,
+    medium-weight: 500,
+    regular-weight: 400,
+  ),
+  density: (
+    scale: 0
+  )
+));
+
+.custom-dark-theme {
+  @include mat.all-component-themes($dark-theme);
+  // Enable backwards compatibility for color="primary" on components
+  @include mat.color-variants-backwards-compatibility($dark-theme);
+  // Apply custom toolbar theming
+  @include toolbar.toolbar-theme($dark-theme);
+  // Apply high contrast overrides for better accessibility
+  @include custom-colors.high-contrast-overrides(dark);
+}

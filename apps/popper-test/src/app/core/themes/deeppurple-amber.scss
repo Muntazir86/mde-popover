@@ -1,28 +1,30 @@
 @use '@angular/material' as mat;
-@use '@angular/material/core/m2/' as m2;
+@use './toolbar-overrides' as toolbar;
 
-// Include non-theme styles for core.
-
-// Define a light theme using Material 3
-$primary: m2.define-palette(m2.$deep-purple-palette);
-$accent: m2.define-palette(m2.$amber-palette, A200, A100, A400);
-
-$theme: m2.define-light-theme(
-  (
-    color: (
-      primary: $primary,
-      accent: $accent,
-    ),
-    typography: m2.define-typography-config(),
-    density: 0,
+// Define the theme using Material 3 (M3) approach
+$theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,  // Using violet as closest to deep purple
+    tertiary: mat.$orange-palette,  // Using orange as closest to amber
+  ),
+  typography: (
+    plain-family: 'Roboto, sans-serif',
+    brand-family: 'Roboto, sans-serif',
+    bold-weight: 700,
+    medium-weight: 500,
+    regular-weight: 400,
+  ),
+  density: (
+    scale: 0
   )
-);
+));
 
 .deeppurple-amber-theme {
-  // Emit theme-dependent styles for common features used across multiple components.
-  @include mat.elevation-classes();
-  @include mat.app-background();
-
-  // Include the theme mixins for other components you use here.
+  // Include the theme mixins for all components
   @include mat.all-component-themes($theme);
+  // Enable backwards compatibility for color="primary" on components
+  @include mat.color-variants-backwards-compatibility($theme);
+  // Apply custom toolbar theming
+  @include toolbar.toolbar-theme($theme);
 }

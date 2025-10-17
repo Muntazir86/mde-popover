@@ -1,76 +1,95 @@
 import {
-  AfterViewInit,
   Component,
   ElementRef,
-  EventEmitter,
   HostBinding,
-  Input,
-  OnInit,
-  Output,
+  model,
 } from '@angular/core';
+import { MatButton } from '@angular/material/button';
+import { NgStyle } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'theme-picker',
     templateUrl: './theme-picker.component.html',
     styleUrls: ['./theme-picker.component.scss'],
-    standalone: false
+    imports: [MatButton, NgStyle, MatIcon]
 })
-export class ThemePickerComponent implements OnInit {
+export class ThemePickerComponent {
   hovering: any = null;
 
   @HostBinding('class.mat-elevation-z4') elevation = true;
 
   items: any = [
     {
-      className: 'pink-grey-theme',
+      className: 'indigo-pink-theme',
       styles: {
-        'background-color': '#e91e63',
+        'background-color': '#6750A4',  // M3 violet-50
         background:
-          '-webkit-linear-gradient(-45deg, #e91e63 0%, #e91e63 50%, #bdbdbd 51%, #bdbdbd 100%)',
+          '-webkit-linear-gradient(-45deg, #6750A4 0%, #6750A4 50%, #F06292 51%, #F06292 100%)',  // violet + rose
       },
     },
+    // {
+    //   className: 'deeppurple-amber-theme',
+    //   styles: {
+    //     'background-color': '#6750A4',  // M3 violet-50
+    //     background:
+    //       '-webkit-linear-gradient(-45deg, #6750A4 0%, #6750A4 50%, #FF9800 51%, #FF9800 100%)',  // violet + orange
+    //   },
+    // },
     {
-      className: 'deeppurple-amber-theme',
+      className: 'pink-bluegrey-theme',
       styles: {
-        'background-color': '#673ab7',
+        'background-color': '#AB2E5C',  // M3 rose-50 (dark)
         background:
-          '-webkit-linear-gradient(-45deg, #673ab7 0%, #673ab7 50%, #ffc107 51%, #ffc107 100%)',
+          '-webkit-linear-gradient(-45deg, #AB2E5C 0%, #AB2E5C 50%, #5E92F3 51%, #5E92F3 100%)',  // rose + azure (dark theme)
       },
     },
+    // {
+    //   className: 'pink-grey-theme',
+    //   styles: {
+    //     'background-color': '#AB2E5C',  // M3 rose-50 (dark)
+    //     background:
+    //       '-webkit-linear-gradient(-45deg, #AB2E5C 0%, #AB2E5C 50%, #5E92F3 51%, #5E92F3 100%)',  // rose + azure (dark theme)
+    //   },
+    // },
     {
       className: 'indigo-grey-theme',
       styles: {
-        'background-color': '#3f51b5',
+        'background-color': '#6750A4',  // M3 violet-50
         background:
-          '-webkit-linear-gradient(-45deg, #3f51b5 0%, #3f51b5 50%, #9e9e9e 51%, #9e9e9e 100%)',
+          '-webkit-linear-gradient(-45deg, #6750A4 0%, #6750A4 50%, #90CAF9 51%, #90CAF9 100%)',  // violet + azure
       },
     },
+    {
+      className: 'purple-green-theme',
+      styles: {
+        'background-color': '#8559A5',  // M3 violet-50 (dark)
+        background:
+          '-webkit-linear-gradient(-45deg, #8559A5 0%, #8559A5 50%, #4CAF50 51%, #4CAF50 100%)',  // violet + green (dark theme)
+      }
+    },
+    {
+      className: 'cyan-orange-theme',
+      styles: {
+        'background-color': '#00ACC1',  // M3 cyan-50 (dark)
+        background:
+          '-webkit-linear-gradient(-45deg, #00ACC1 0%, #00ACC1 50%, #FF9800 51%, #FF9800 100%)',  // cyan + orange (dark theme)
+      }
+    },
+    {
+      className: 'custom-dark-theme',
+      styles: {
+        'background-color': '#CA9577',  // Custom primary color (warm terracotta)
+        background:
+          '-webkit-linear-gradient(-45deg, #CA9577 0%, #CA9577 50%, #387A71 51%, #387A71 100%)',  // custom primary + tertiary
+      }
+    },
     // {
-    //   className: 'purple-green-theme',
+    //   className: 'custom-standalone-dark-theme',
     //   styles: {
-    //     'background-color': '#2196f3',
-    //     'background': '-webkit-linear-gradient(-45deg, #7b1fa2 0%, #7b1fa2 50%, #69f0ae 51%, #69f0ae 100%)'
-    //   }
-    // },
-    // {
-    //   className: 'indigo-pink-theme',
-    //   styles: {
-    //     'background-color': '#2196f3',
-    //     'background': '-webkit-linear-gradient(-45deg, #3f51b5 0%, #3f51b5 50%, #ff4081 51%, #ff4081 100%)'
-    //   }
-    // },
-    // {
-    //   className: 'pink-bluegrey-theme',
-    //   styles: {
-    //     'background-color': '#e91e63',
-    //     'background': '-webkit-linear-gradient(-45deg, #e91e63 0%, #e91e63 50%, #bdbdbd 51%, #bdbdbd 100%)'
-    //   }
-    // },
-    // {
-    //   className: 'cyan-orange-theme',
-    //   styles: {
-    //     'background-color': '#00000',
-    //     'background': '-webkit-linear-gradient(-45deg, #e91e63 0%, #e91e63 50%, #bdbdbd 51%, #bdbdbd 100%)'
+    //     'background-color': '#9c6c51',  // Custom primary-50 (dark)
+    //     background:
+    //       '-webkit-linear-gradient(-45deg, #9c6c51 0%, #9c6c51 50%, #408279 51%, #408279 100%)',  // custom primary + tertiary (dark)
     //   }
     // },
   ];
@@ -96,22 +115,20 @@ export class ThemePickerComponent implements OnInit {
 }
 */
 
-  themeValue = '';
-  @Output() themeChange = new EventEmitter();
+  // themeChange = output<string>();
+  theme = model<string>('');
+  
+  // themeSignal = signal<string>('');
 
-  @Input()
-  get theme() {
-    return this.themeValue;
-  }
+  // @Input()
+  // get theme() {
+  //   return this.themeValue;
+  // }
 
-  set theme(val) {
-    this.themeValue = val;
-    this.themeChange.emit(this.themeValue);
-  }
-
-  constructor() {}
-
-  ngOnInit() {}
+  // set theme(val) {
+  //   this.themeValue = val;
+  //   this.themeChange.emit(this.themeValue);
+  // }
 
   onItemKeydown(event, className = null) {
     const next = new ElementRef(event.nextSibling);

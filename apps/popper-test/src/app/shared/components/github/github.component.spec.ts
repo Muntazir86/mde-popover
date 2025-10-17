@@ -8,8 +8,8 @@ describe('GithubComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [GithubComponent],
-    }).compileComponents();
+    imports: [GithubComponent],
+}).compileComponents();
   }));
 
   beforeEach(() => {

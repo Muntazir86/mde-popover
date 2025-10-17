@@ -1,15 +1,18 @@
 import { Component, OnInit } from '@angular/core';
-import { MdePopoverTrigger } from '@muntazir/material-extended';
+import { MdePopoverTrigger, MdePopoverModule } from '@muntazir/material-extended';
 
 // import 'rxjs/add/operator/first';
 
 import { first } from 'rxjs/operators';
+import { FormsModule } from '@angular/forms';
+import { MatFormField, MatHint } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
     styleUrls: ['./form.component.scss'],
-    standalone: false
+    imports: [FormsModule, MatFormField, MdePopoverModule, MatInput, MatHint]
 })
 export class PageExamplesFormComponent implements OnInit {
   popoverText: string;
@@ -24,19 +27,19 @@ export class PageExamplesFormComponent implements OnInit {
   ngOnInit() {}
 
   openPopover(ref: MdePopoverTrigger, text: string) {
-    console.log('this.previousRef', this.previousRef);
-    console.log('ref', ref);
-    // if (this.previousRef !== ref) {
-    // this.popoverText = text;
-    // ref.openPopover();
-    // }
+    // console.log('this.previousRef', this.previousRef);
+    // console.log('ref', ref);
+    if (this.previousRef !== ref) {
+    this.popoverText = text;
+    ref.openPopover();
+    }
 
     if (this.previousRef !== ref) {
-      console.log('this.previousRef !== ref');
+      // console.log('this.previousRef !== ref');
       ref.openPopover();
       this.popoverSwitching = false;
     } else {
-      console.log('this.previousRef === ref');
+      // console.log('this.previousRef === ref');
       this.popoverSwitching = true;
       clearTimeout(this.closeTimeout);
     }

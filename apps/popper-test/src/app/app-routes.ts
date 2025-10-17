@@ -1,10 +1,8 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-
+import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { PageErrorComponent } from './pages/error/error.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
@@ -19,16 +17,10 @@ const routes: Routes = [
   {
     path: 'examples',
     loadChildren: () =>
-      import('./pages/examples/examples.module').then((m) => m.ExamplesModule),
+      import('./pages/examples/examples-routes').then((m) => m.ExamplesRoutes),
   },
   {
     path: '**',
     component: PageErrorComponent,
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}

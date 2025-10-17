@@ -8,11 +8,19 @@ import {
 } from '@angular/animations';
 
 /**
+ * @deprecated Since version 20.0. Use CSS-based animations with animate.enter and animate.leave directives instead.
+ * This file is kept for backward compatibility only.
+ * This file will be removed in version 11.0, Angular version 22.0
+ * 
  * Below are all the animations for the md-popover component.
  * Animation duration and timing values are based on AngularJS Material.
  */
 
 /**
+ * @deprecated Since version 20.0. Use CSS-based animations with animate.enter and animate.leave directives instead.
+ * This file is kept for backward compatibility only.
+ * This file will be removed in version 11.0, Angular version 22.0
+ * 
  * This animation controls the popover panel's entry and exit from the page.
  *
  * When the popover panel is added to the DOM, it scales in and fades in its border.

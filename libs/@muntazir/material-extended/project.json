@@ -8,15 +8,14 @@
     "build": {
       "executor": "@nx/angular:package",
       "options": {
-        "project": "libs/@muntazir/material-extended/ng-package.json"
+        "project": "libs/@muntazir/material-extended/ng-package.json",
+        "tsConfig": "libs/@muntazir/material-extended/tsconfig.lib.json"
       },
       "configurations": {
         "production": {
           "tsConfig": "libs/@muntazir/material-extended/tsconfig.lib.prod.json"
         },
-        "development": {
-          "tsConfig": "libs/@muntazir/material-extended/tsconfig.lib.json"
-        }
+        "development": {}
       },
       "defaultConfiguration": "production"
     },
