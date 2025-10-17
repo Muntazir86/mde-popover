@@ -109,3 +109,33 @@
     right: 20px;
   }
 }
+
+// Animation classes for animate.enter and animate.leave
+.mde-popover-enter-animation {
+  animation: mde-popover-scale-fade-in 200ms cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.mde-popover-leave-animation {
+  animation: mde-popover-fade-out 50ms 100ms linear forwards;
+}
+
+// Keyframe animations
+@keyframes mde-popover-scale-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes mde-popover-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

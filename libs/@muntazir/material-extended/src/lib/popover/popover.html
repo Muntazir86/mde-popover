@@ -9,8 +9,8 @@
     (click)="onClick()"
     (mouseover)="onMouseOver()"
     (mouseleave)="onMouseLeave()"
-    [@.disabled]="disableAnimation"
-    [@transformPopover]="'enter'"
+    [animate.enter]="disableAnimation ? '' : 'mde-popover-enter-animation'"
+    [animate.leave]="disableAnimation ? '' : 'mde-popover-leave-animation'"
     >
     @if (!overlapTrigger) {
       <div
