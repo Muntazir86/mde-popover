@@ -1,4 +1,4 @@
-import { Directive, ElementRef } from '@angular/core';
+import { Directive, ElementRef, inject } from '@angular/core';
 
 @Directive({
     selector: 'mde-popover-target, [mdePopoverTarget]',
@@ -7,6 +7,6 @@ import { Directive, ElementRef } from '@angular/core';
 })
 export class MdePopoverTarget {
   // tslint:disable-line:directive-class-suffix
+  _elementRef = inject(ElementRef);
 
-  constructor(public _elementRef: ElementRef) {}
 }

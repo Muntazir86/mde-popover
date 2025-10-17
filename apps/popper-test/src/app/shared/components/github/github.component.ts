@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostBinding, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostBinding, inject, OnInit } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
 import { MatButton } from '@angular/material/button';
@@ -12,12 +12,10 @@ import { MatIcon } from '@angular/material/icon';
 })
 export class GithubComponent implements OnInit, AfterViewInit {
   @HostBinding('class.mat-elevation-z4') elevation = true;
-
+  private _http = inject(HttpClient);
   details: any = {};
   issues: any = {};
   pulls: any = {};
-
-  constructor(private _http: HttpClient) {}
 
   ngOnInit() {
     this.details = {

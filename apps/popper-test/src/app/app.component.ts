@@ -1,4 +1,4 @@
-import { Component, HostBinding } from '@angular/core';
+import { Component, HostBinding, inject } from '@angular/core';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MdePopoverModule } from '@muntazir/material-extended';
@@ -21,6 +21,7 @@ export const DEFAULT_THEME = 'deeppurple-amber-theme';
 })
 export class AppComponent {
   @HostBinding('class') _themeClass: string = DEFAULT_THEME;
+  private overlayContainer = inject(OverlayContainer);
 
   get themeClass() {
     return this._themeClass;
@@ -35,7 +36,7 @@ export class AppComponent {
     }
   }
 
-  constructor(private overlayContainer: OverlayContainer) {
+  constructor() {
     this.overlayContainer.getContainerElement().classList.add(this.themeClass);
   }
 }
