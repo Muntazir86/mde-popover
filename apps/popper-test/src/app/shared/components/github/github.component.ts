@@ -1,12 +1,14 @@
 import { AfterViewInit, Component, HostBinding, OnInit } from '@angular/core';
 
 import { HttpClient } from '@angular/common/http';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'app-github',
     templateUrl: './github.component.html',
     styleUrls: ['./github.component.scss'],
-    standalone: false
+    imports: [MatButton, MatIcon]
 })
 export class GithubComponent implements OnInit, AfterViewInit {
   @HostBinding('class.mat-elevation-z4') elevation = true;

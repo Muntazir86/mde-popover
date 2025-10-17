@@ -1,11 +1,9 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-
+import { Routes } from '@angular/router';
 import { PageExamplesComponent } from './examples.component';
 import { PageExamplesFormComponent } from './form/form.component';
 import { PageErrorComponent } from '../error/error.component';
 
-const routes: Routes = [
+export const ExamplesRoutes: Routes = [
   {
     path: '',
     component: PageExamplesComponent,
@@ -36,9 +34,3 @@ const routes: Routes = [
     component: PageErrorComponent,
   },
 ];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-})
-export class ExamplesRoutingModule {}

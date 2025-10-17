@@ -8,12 +8,15 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { MatButton } from '@angular/material/button';
+import { NgStyle } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
     selector: 'theme-picker',
     templateUrl: './theme-picker.component.html',
     styleUrls: ['./theme-picker.component.scss'],
-    standalone: false
+    imports: [MatButton, NgStyle, MatIcon]
 })
 export class ThemePickerComponent implements OnInit {
   hovering: any = null;
