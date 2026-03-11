@@ -1,6 +1,6 @@
 import { Component, inject, Renderer2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { CommonModule } from '@angular/common';
+
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MdePopoverModule } from '@muntazir/material-extended';
