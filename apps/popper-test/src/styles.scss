@@ -92,3 +92,9 @@ body {
     }
   }
 }
+
+// Form field help is anchored to a group and can cover the next inputs.
+// Pass those clicks through to the fields.
+.cdk-overlay-pane:has(.form-help-popover) {
+  pointer-events: none;
+}

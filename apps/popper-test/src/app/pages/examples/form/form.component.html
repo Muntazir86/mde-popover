@@ -48,7 +48,9 @@
 
   <mde-popover
     #inputPopover="mdePopover"
+    class="form-help-popover"
     [mdeFocusTrapEnabled]="false"
+    [mdePopoverDisableAnimation]="true"
     mdePopoverPositionY="below"
     mdePopoverPositionX="before"
     [mdePopoverOffsetY]="0"
@@ -101,7 +103,7 @@
           <input
             matInput
             placeholder="State"
-            (focus)="openPopover(addressTarget, 'What\'s your home Sate?')"
+            (focus)="openPopover(addressTarget, 'What\'s your home State?')"
             (blur)="closePopover(addressTarget)"
           />
         </mat-form-field>
