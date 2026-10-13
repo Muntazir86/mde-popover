@@ -362,7 +362,10 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
 
     // Focus only needs to be reset to the host element if the popover was opened
     // by the keyboard and manually shifted to the first popover item.
-    if (!this._openedByMouse) {
+    // A "none" trigger is opened programmatically while focus stays on some other
+    // element (an input inside or beside the host). Moving focus onto the host
+    // pulls it away from that element.
+    if (!this._openedByMouse && this.triggerEvent !== 'none') {
       this.focus();
     }
     this._openedByMouse = false;
