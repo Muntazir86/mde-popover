@@ -1,17 +1,21 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# Installs dependencies and builds the library and demo on pull requests and on
+# pushes to master. Publishes the demo to the gh-pages branch only when commits
+# land on master.
 
 name: Node.js CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
+
+permissions:
+  contents: read
+  actions: write
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,16 +24,59 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Prepare and deploy
-      env: 
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        npm install
-        npm run build:prod
-        npm run deploy
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Build library
+        run: npm run build:prod
+      - name: Build demo
+        run: npm run build:demo
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+      - name: Use Node.js 22.14.0
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22.14.0
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Deploy to gh-pages
+        run: |
+          set -euo pipefail
+          if [[ $- == *x* ]]; then
+            echo "Refusing to deploy with shell tracing enabled."
+            exit 1
+          fi
+          # actions/checkout stored an Authorization header for GITHUB_TOKEN.
+          # angular-cli-ghpages copies GH_TOKEN or GITHUB_TOKEN into the clone
+          # URL and logs that URL, so hide those variables and authenticate with
+          # the header instead.
+          header="$(git config --local --get http.https://github.com/.extraheader)"
+          printf '::add-mask::%s\n' "${header}"
+          env \
+            -u GH_TOKEN \
+            -u GITHUB_TOKEN \
+            -u PERSONAL_TOKEN \
+            GIT_TERMINAL_PROMPT=0 \
+            GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0=http.https://github.com/.extraheader \
+            GIT_CONFIG_VALUE_0="${header}" \
+            npm run deploy
