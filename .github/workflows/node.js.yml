@@ -57,7 +57,9 @@ jobs:
           node-version: 22.14.0
           cache: npm
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+      - name: Build library
+        run: npm run build:prod
       - name: Deploy to gh-pages
         run: |
           set -euo pipefail
