@@ -1,9 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MdePopoverTrigger, MdePopoverModule } from '@muntazir/material-extended';
 
-// import 'rxjs/add/operator/first';
-
-import { first } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { MatFormField, MatHint } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -14,88 +11,56 @@ import { MatInput } from '@angular/material/input';
     styleUrls: ['./form.component.scss'],
     imports: [FormsModule, MatFormField, MdePopoverModule, MatInput, MatHint]
 })
-export class PageExamplesFormComponent implements OnInit {
+export class PageExamplesFormComponent implements OnDestroy {
   popoverText: string;
   previousRef: MdePopoverTrigger;
   popoverOpen = false;
-  popoverSwitching = false;
 
-  closeTimeout: any;
+  private closeTimeout: ReturnType<typeof setTimeout> | null = null;
 
-  constructor() {}
-
-  ngOnInit() {}
+  ngOnDestroy() {
+    this.clearCloseTimer();
+  }
 
   openPopover(ref: MdePopoverTrigger, text: string) {
-    // console.log('this.previousRef', this.previousRef);
-    // console.log('ref', ref);
-    if (this.previousRef !== ref) {
+    // Focus moved between fields (or returned) before the leave delay elapsed.
+    this.clearCloseTimer();
     this.popoverText = text;
-    ref.openPopover();
-    }
 
     if (this.previousRef !== ref) {
-      // console.log('this.previousRef !== ref');
+      const previous = this.previousRef;
+      // Open the new anchor first so the shared projected content moves with it,
+      // then close the previous anchor. Same-anchor fields only swap the text.
+      if (!ref.popoverOpen) {
+        ref.openPopover();
+      }
+      if (previous?.popoverOpen) {
+        previous.closePopover();
+      }
+    } else if (!ref.popoverOpen) {
       ref.openPopover();
-      this.popoverSwitching = false;
-    } else {
-      // console.log('this.previousRef === ref');
-      this.popoverSwitching = true;
-      clearTimeout(this.closeTimeout);
     }
 
-    this.popoverText = text;
     this.previousRef = ref;
     this.popoverOpen = true;
   }
 
   closePopover(ref: MdePopoverTrigger) {
+    this.clearCloseTimer();
     this.closeTimeout = setTimeout(() => {
-      // if (!this.popoverSwitching) {
-      ref.closePopover();
-      this.popoverOpen = false;
-      this.previousRef = null;
-      // }
+      this.closeTimeout = null;
+      if (this.previousRef === ref) {
+        ref.closePopover();
+        this.popoverOpen = false;
+        this.previousRef = null;
+      }
     }, 400);
   }
 
-  openPopoverOld(ref: MdePopoverTrigger, text: string) {
-    console.log('this.previousRef', this.previousRef);
-    console.log('ref', ref);
-    // if (this.previousRef !== ref) {
-    // this.popoverText = text;
-    // ref.openPopover();
-    // }
-    if (this.popoverOpen) {
-      console.log('switching');
-      this.popoverSwitching = true;
-      // setTimeout(() => {
+  private clearCloseTimer() {
+    if (this.closeTimeout != null) {
       clearTimeout(this.closeTimeout);
-      // }, 200);
-    } else {
-      ref.openPopover();
-      this.popoverSwitching = false;
+      this.closeTimeout = null;
     }
-    ref.closed.pipe(first()).subscribe(() => {
-      console.log('event', event);
-    });
-    this.popoverText = text;
-    this.previousRef = ref;
-    this.popoverOpen = true;
-  }
-
-  closePopoverOld(ref) {
-    this.closeTimeout = setTimeout(() => {
-      if (!this.popoverSwitching) {
-        ref.closePopover();
-        this.popoverOpen = false;
-        console.log('Close, this.popoverSwitching', this.popoverSwitching);
-      } else {
-        console.log(
-          "Don't close, this.popoverSwitching",
-          this.popoverSwitching
-        );
-      }
-    }, 600);
   }
 }

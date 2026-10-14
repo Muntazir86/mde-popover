@@ -22,7 +22,7 @@
       class="mde-popover-content"
       [ngStyle]="popoverContentStyles"
       [cdkTrapFocus]="focusTrapEnabled"
-      [cdkTrapFocusAutoCapture]="focusTrapAutoCaptureEnabled"
+      [cdkTrapFocusAutoCapture]="focusTrapEnabled && focusTrapAutoCaptureEnabled"
       >
       <ng-content></ng-content>
     </div>
