@@ -27,15 +27,17 @@
         <mat-form-field subscriptSizing="dynamic">
           <mat-label>mdePopoverPositionX</mat-label>
           <mat-select [(ngModel)]="config.positionX" data-testid="builder-position-x">
-            <mat-option value="before">before</mat-option>
-            <mat-option value="after">after</mat-option>
+            @for (o of positionXOptions; track o) {
+              <mat-option [value]="o">{{ o }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
         <mat-form-field subscriptSizing="dynamic">
           <mat-label>mdePopoverPositionY</mat-label>
           <mat-select [(ngModel)]="config.positionY" data-testid="builder-position-y">
-            <mat-option value="above">above</mat-option>
-            <mat-option value="below">below</mat-option>
+            @for (o of positionYOptions; track o) {
+              <mat-option [value]="o">{{ o }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
       </div>
@@ -54,6 +56,7 @@
       <mat-slide-toggle [(ngModel)]="config.overlapTrigger" data-testid="builder-overlap">
         Overlap trigger <code>mdePopoverOverlapTrigger</code>
       </mat-slide-toggle>
+      <p class="note">Overlap moves the panel onto the trigger's edge; it is most visible with start/center/end positions.</p>
       <mat-form-field subscriptSizing="dynamic">
         <mat-label>mdePopoverScrollStrategy</mat-label>
         <mat-select [(ngModel)]="config.scrollStrategy">
@@ -68,9 +71,10 @@
       <mat-slide-toggle [(ngModel)]="config.closeOnClick" data-testid="builder-close-on-click">
         Close on content click <code>mdePopoverCloseOnClick</code>
       </mat-slide-toggle>
-      <mat-slide-toggle [(ngModel)]="config.closeOnClickTrigger" data-testid="builder-close-on-click-trigger">
+      <mat-slide-toggle [(ngModel)]="config.closeOnClickTrigger" [disabled]="!closeOnClickTriggerApplies" data-testid="builder-close-on-click-trigger">
         Close on trigger click <code>mdePopoverCloseOnClickTrigger</code>
       </mat-slide-toggle>
+      <p class="note" data-testid="builder-close-on-click-trigger-hint">{{ closeOnClickTriggerHint }}</p>
       <mat-slide-toggle [(ngModel)]="config.backdropCloseOnClick" data-testid="builder-backdrop-close">
         Close on outside click <code>mdePopoverBackdropCloseOnClick</code>
       </mat-slide-toggle>
@@ -93,31 +97,33 @@
       </div>
 
       <h3>Arrow</h3>
+      <p class="note" [class.warn]="!arrowVisible" data-testid="builder-arrow-hint">
+        {{ arrowVisible ? 'The arrow is visible for the current position.' : arrowHiddenReason }}
+      </p>
       <div class="row">
         <mat-form-field subscriptSizing="dynamic">
           <mat-label>mdePopoverArrowWidth</mat-label>
-          <input matInput type="number" min="0" [(ngModel)]="config.arrowWidth" />
+          <input matInput type="number" min="0" [(ngModel)]="config.arrowWidth" [disabled]="!arrowVisible" data-testid="builder-arrow-width" />
           <span matTextSuffix>px</span>
         </mat-form-field>
         <mat-form-field subscriptSizing="dynamic">
           <mat-label>mdePopoverArrowColor</mat-label>
-          <input matInput [(ngModel)]="config.arrowColor" />
-          <input matTextSuffix class="swatch" type="color" aria-label="Pick arrow color" (input)="config.arrowColor = $any($event.target).value" />
+          <input matInput [(ngModel)]="config.arrowColor" [disabled]="!arrowVisible" data-testid="builder-arrow-color" />
+          <input matTextSuffix class="swatch" type="color" aria-label="Pick arrow color" [disabled]="!arrowVisible" (input)="config.arrowColor = $any($event.target).value" />
         </mat-form-field>
       </div>
       <div class="row">
         <mat-form-field subscriptSizing="dynamic">
           <mat-label>mdePopoverArrowOffsetX</mat-label>
-          <input matInput type="number" [(ngModel)]="config.arrowOffsetX" />
+          <input matInput type="number" [(ngModel)]="config.arrowOffsetX" [disabled]="!arrowVisible" />
           <span matTextSuffix>px</span>
         </mat-form-field>
         <mat-form-field subscriptSizing="dynamic">
           <mat-label>mdePopoverArrowOffsetY</mat-label>
-          <input matInput type="number" [(ngModel)]="config.arrowOffsetY" />
+          <input matInput type="number" [(ngModel)]="config.arrowOffsetY" [disabled]="!arrowVisible" />
           <span matTextSuffix>px</span>
         </mat-form-field>
       </div>
-      <p class="note">The arrow shows when one axis is centered; corner placements hide it.</p>
 
       <h3>Accessibility</h3>
       <mat-slide-toggle [(ngModel)]="config.focusTrapEnabled">
@@ -142,25 +148,32 @@
           <button mat-stroked-button (click)="reset()" data-testid="builder-reset">Reset</button>
         </div>
         <div class="stage" [class]="'stage align-' + align">
-          <button
-            mat-flat-button
-            data-testid="builder-trigger"
-            [mdePopoverTriggerFor]="playgroundPopover"
-            [mdePopoverCloseOnClickTrigger]="config.closeOnClickTrigger"
-            [mdePopoverBackdropCloseOnClick]="config.backdropCloseOnClick"
-            [mdeDisablePopoverTrigger]="config.disableTrigger"
-            #trigger="mdePopoverTrigger"
-          >
-            {{ triggerLabel }}
-          </button>
+          @for (k of [triggerKey]; track k) {
+            <button
+              mat-flat-button
+              data-testid="builder-trigger"
+              [mdePopoverTriggerFor]="playgroundPopover"
+              [mdePopoverCloseOnClickTrigger]="config.closeOnClickTrigger"
+              [mdePopoverBackdropCloseOnClick]="config.backdropCloseOnClick"
+              [mdeDisablePopoverTrigger]="config.disableTrigger"
+            >
+              {{ triggerLabel }}
+            </button>
+          }
         </div>
         @if (config.triggerOn === 'none') {
           <div class="manual">
-            <button mat-button (click)="trigger.openPopover()" data-testid="builder-open">openPopover()</button>
-            <button mat-button (click)="trigger.closePopover()">closePopover()</button>
+            <button mat-button (click)="openPreview()" data-testid="builder-open">openPopover()</button>
+            <button mat-button (click)="closePreview()" data-testid="builder-close">closePopover()</button>
           </div>
         }
-        <p class="note">Press Escape to close. With click mode the page is covered by a transparent backdrop while open.</p>
+        <p class="note" data-testid="builder-close-note">
+          The library closes on Escape only while focus is inside the panel. In this playground Escape
+          works anywhere, and the popover's own Close button always closes it.
+          @if (config.triggerOn === 'click') {
+            In click mode a transparent backdrop covers the page while the popover is open.
+          }
+        </p>
       </mat-card-content>
     </mat-card>
 
@@ -201,7 +214,7 @@
     <mat-card-content>
       <strong>Hello from mde-popover</strong>
       <p>{{ contentHint }}</p>
-      <button mat-button>Focusable action</button>
+      <button mat-stroked-button (click)="closePreview(); $event.stopPropagation()" data-testid="builder-popover-close">Close</button>
     </mat-card-content>
   </mat-card>
 </mde-popover>

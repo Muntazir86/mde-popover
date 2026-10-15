@@ -36,6 +36,7 @@ describe('PageExamplesBuilderComponent', () => {
   it('only lists inputs that differ from the library defaults', () => {
     expect(component.changedInputs).toEqual([
       'mdePopoverTriggerOn',
+      'mdePopoverPositionX',
       'mdePopoverOverlapTrigger',
     ]);
     expect(component.snippet).toContain('mdePopoverTriggerOn="click"');
@@ -62,8 +63,29 @@ describe('PageExamplesBuilderComponent', () => {
     expect(component.align).toBe('center');
   });
 
-  it('starts from the library defaults except for click and no overlap', () => {
-    expect({ ...PLAYGROUND_DEFAULTS, triggerOn: 'hover', overlapTrigger: true }).toEqual(
+  it('shows the arrow only for a centered axis without overlap', () => {
+    expect(component.arrowVisible).toBe(true);
+    component.config.positionX = 'after';
+    expect(component.arrowVisible).toBe(false);
+    component.config.positionY = 'start';
+    expect(component.arrowVisible).toBe(false);
+    component.config.positionY = 'center';
+    expect(component.arrowVisible).toBe(true);
+    component.config.overlapTrigger = true;
+    expect(component.arrowVisible).toBe(false);
+  });
+
+  it('only enables closeOnClickTrigger where it has an effect', () => {
+    expect(component.closeOnClickTriggerApplies).toBe(true);
+    component.config.backdropCloseOnClick = false;
+    expect(component.closeOnClickTriggerApplies).toBe(false);
+    component.config.backdropCloseOnClick = true;
+    component.config.triggerOn = 'hover';
+    expect(component.closeOnClickTriggerApplies).toBe(false);
+  });
+
+  it('starts from the library defaults except for click, center and no overlap', () => {
+    expect({ ...PLAYGROUND_DEFAULTS, triggerOn: 'hover', positionX: 'after', overlapTrigger: true }).toEqual(
       LIBRARY_DEFAULTS
     );
   });

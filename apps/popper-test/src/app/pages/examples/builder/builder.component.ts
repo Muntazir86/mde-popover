@@ -1,14 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import {
   MdePopoverModule,
   MdePopoverPositionX,
   MdePopoverPositionY,
   MdePopoverScrollStrategy,
+  MdePopoverTrigger,
   MdePopoverTriggerEvent,
 } from '@muntazir/material-extended';
 import { FormsModule } from '@angular/forms';
 import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatFormField, MatLabel, MatHint, MatSuffix } from '@angular/material/form-field';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatSelect, MatOption } from '@angular/material/select';
 import { MatInput } from '@angular/material/input';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
@@ -64,12 +65,16 @@ export const LIBRARY_DEFAULTS: PlaygroundConfig = {
   focusTrapAutoCaptureEnabled: true,
 };
 
-/** Playground starting point: a click popover placed below the trigger without overlap. */
+/** Playground starting point: a click popover centered below the trigger, with its arrow visible. */
 export const PLAYGROUND_DEFAULTS: PlaygroundConfig = {
   ...LIBRARY_DEFAULTS,
   triggerOn: 'click',
+  positionX: 'center',
   overlapTrigger: false,
 };
+
+export const POSITION_X_OPTIONS: MdePopoverPositionX[] = ['before', 'start', 'center', 'end', 'after'];
+export const POSITION_Y_OPTIONS: MdePopoverPositionY[] = ['above', 'start', 'center', 'end', 'below'];
 
 const ATTRS: { key: keyof PlaygroundConfig; attr: string }[] = [
   { key: 'triggerOn', attr: 'mdePopoverTriggerOn' },
@@ -113,8 +118,7 @@ function binding(attr: string, value: unknown): string {
     MatCardContent,
     MatFormField,
     MatLabel,
-    MatHint,
-    MatSuffix,
+        MatSuffix,
     MatSelect,
     MatOption,
     MatInput,
@@ -126,6 +130,10 @@ function binding(attr: string, value: unknown): string {
   ],
 })
 export class PageExamplesBuilderComponent {
+  @ViewChild(MdePopoverTrigger) trigger?: MdePopoverTrigger;
+
+  readonly positionXOptions = POSITION_X_OPTIONS;
+  readonly positionYOptions = POSITION_Y_OPTIONS;
   config: PlaygroundConfig = { ...PLAYGROUND_DEFAULTS };
   align: TriggerAlign = 'center';
   copied = false;
@@ -142,6 +150,49 @@ export class PageExamplesBuilderComponent {
       default:
         return 'Manual (none)';
     }
+  }
+
+  /** The library only renders the arrow when one axis is centered and overlap is off. */
+  get arrowVisible(): boolean {
+    const { positionX: x, positionY: y, overlapTrigger } = this.config;
+    return !overlapTrigger && (x === 'center' || y === 'center');
+  }
+
+  get arrowHiddenReason(): string {
+    const { positionX: x, positionY: y } = this.config;
+    if (x !== 'center' && y !== 'center') {
+      return 'Arrow hidden: it only renders when positionX or positionY is "center".';
+    }
+    return 'Arrow hidden: it only renders when overlap is off.';
+  }
+
+  /**
+   * mdePopoverCloseOnClickTrigger only applies to click mode, and it is only observable
+   * while outside-click close is on (otherwise the click backdrop covers the trigger).
+   */
+  get closeOnClickTriggerApplies(): boolean {
+    return this.config.triggerOn === 'click' && this.config.backdropCloseOnClick && !this.config.disableTrigger;
+  }
+
+  get closeOnClickTriggerHint(): string {
+    if (this.config.triggerOn !== 'click') {
+      return 'Only used with click mode.';
+    }
+    if (!this.config.backdropCloseOnClick) {
+      return 'No effect while outside-click close is off: the click backdrop covers the trigger.';
+    }
+    return this.config.closeOnClickTrigger
+      ? 'Clicking the trigger again closes the popover.'
+      : 'The trigger stays above the backdrop, so clicking it keeps the popover open.';
+  }
+
+  /**
+   * The trigger directive copies popover settings, styles and its own inputs once at init, and it
+   * caches the overlay (with a locked position) after the first open. Re-creating the trigger
+   * whenever the config changes keeps the preview in sync with the controls.
+   */
+  get triggerKey(): string {
+    return JSON.stringify(this.config);
   }
 
   get contentHint(): string {
@@ -173,7 +224,22 @@ export class PageExamplesBuilderComponent {
     );
   }
 
+  /** Playground-only escape hatch: Escape anywhere closes the preview popover. */
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closePreview();
+  }
+
+  closePreview(): void {
+    this.trigger?.closePopover();
+  }
+
+  openPreview(): void {
+    this.trigger?.openPopover();
+  }
+
   reset(): void {
+    this.closePreview();
     this.config = { ...PLAYGROUND_DEFAULTS };
     this.align = 'center';
     this.copied = false;

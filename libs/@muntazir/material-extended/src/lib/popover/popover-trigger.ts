@@ -470,6 +470,12 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     if (this.popover.triggerEvent === 'click') {
       overlayState.hasBackdrop = true;
       overlayState.backdropClass = 'cdk-overlay-transparent-backdrop';
+      // Since CDK 21 overlays render in the browser top layer (native popover), which no
+      // z-index can rise above. Keep this overlay in the regular stacking order when the
+      // trigger has to stay clickable above the backdrop.
+      if (!this.closeOnClickTrigger && this.backdropCloseOnClick) {
+        overlayState.usePopover = false;
+      }
     }
 
     overlayState.direction = this.dir;

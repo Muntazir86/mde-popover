@@ -658,6 +658,29 @@ describe('MdePopoverTrigger', () => {
       expect(button.style.zIndex).toBe('999999');
     });
 
+    it('keeps the overlay out of the top layer so the raised trigger stays clickable', async () => {
+      const { button } = await setup((host) => {
+        host.popoverTriggerOn = 'click';
+        host.closeOnClickTrigger = false;
+        host.backdropClose = true;
+      });
+      const create = vi.spyOn(TestBed.inject(Overlay), 'create');
+
+      button.dispatchEvent(mouse('click'));
+      expect(panel()).not.toBeNull();
+      expect(create.mock.calls[0][0]?.usePopover).toBe(false);
+    });
+
+    it('leaves the CDK popover default alone otherwise', async () => {
+      const { button } = await setup((host) => {
+        host.popoverTriggerOn = 'click';
+      });
+      const create = vi.spyOn(TestBed.inject(Overlay), 'create');
+
+      button.dispatchEvent(mouse('click'));
+      expect(create.mock.calls[0][0]?.usePopover).toBeUndefined();
+    });
+
     it('leaves the backdrop in place when backdrop clicks are disabled', async () => {
       const { button } = await setup((host) => {
         host.popoverTriggerOn = 'click';
