@@ -96,7 +96,7 @@
     "version": {
       "conventionalCommits": true,
       "fallbackCurrentVersionResolver": "disk",
-      "manifestRootsToUpdate": ["{projectRoot}", "{workspaceRoot}"],
+      "manifestRootsToUpdate": ["{projectRoot}", "."],
       "updateDependents": "never"
     },
     "changelog": {
