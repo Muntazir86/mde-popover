@@ -19,6 +19,15 @@
     "test": {
       "inputs": ["default", "^production", "{workspaceRoot}/karma.conf.js"],
       "cache": true
+    },
+    "lint": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/eslint.config.mjs",
+        "{workspaceRoot}/apps/popper-test/eslint.config.mjs",
+        "{workspaceRoot}/libs/@muntazir/material-extended/eslint.config.mjs"
+      ]
     }
   },
   "generators": {

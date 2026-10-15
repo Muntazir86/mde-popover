@@ -5,12 +5,12 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
-  Optional,
   Output,
   ViewContainerRef,
   HostListener,
   HostBinding,
   ChangeDetectorRef,
+  inject,
 } from '@angular/core';
 
 import { isFakeMousedownFromScreenReader } from '@angular/cdk/a11y';
@@ -47,17 +47,15 @@ import { PopoverService } from './popover.service';
 @Directive({
     selector: '[mdePopoverTriggerFor]',
     exportAs: 'mdePopoverTrigger',
-    standalone: false
 })
 export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
-  // tslint:disable-line:directive-class-suffix
 
   @HostBinding('attr.aria-haspopup') ariaHaspopup = true;
 
   popoverOpened = new Subject<void>();
   popoverClosed = new Subject<void>();
 
-  private _portal: TemplatePortal<any>;
+  private _portal: TemplatePortal<void>;
   private _overlayRef: OverlayRef | null = null;
   private _popoverOpen = false;
   private _halt = false;
@@ -65,7 +63,7 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   private _positionSubscription: Subscription;
   private _detachmentsSubscription: Subscription;
 
-  private _mouseoverTimer: any;
+  private _mouseoverTimer: ReturnType<typeof setTimeout> | null = null;
 
   // tracking input type is necessary so it's possible to only auto-focus
   // the first item of the list when the popover is opened via the keyboard
@@ -122,10 +120,10 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   @Input('mdePopoverBackdropCloseOnClick') backdropCloseOnClick = true;
 
   /** Disables popover trigger */
-  @Input('mdeDisablePopoverTrigger') disablePopoverTrigger: boolean = false;
+  @Input('mdeDisablePopoverTrigger') disablePopoverTrigger = false;
 
   /** Popver container close on click of trigger, when trigger event is click */
-  @Input('mdePopoverCloseOnClickTrigger') closeOnClickTrigger: boolean = true;
+  @Input('mdePopoverCloseOnClickTrigger') closeOnClickTrigger = true;
 
   /** Event emitted when the associated popover is opened. */
   @Output() opened = new EventEmitter<void>();
@@ -133,14 +131,12 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   /** Event emitted when the associated popover is closed. */
   @Output() closed = new EventEmitter<void>();
 
-  constructor(
-    private _overlay: Overlay,
-    public _elementRef: ElementRef,
-    private _viewContainerRef: ViewContainerRef,
-    @Optional() private _dir: Directionality,
-    private _changeDetectorRef: ChangeDetectorRef,
-    private popoverService: PopoverService
-  ) {}
+  private _overlay = inject(Overlay);
+  _elementRef = inject(ElementRef);
+  private _viewContainerRef = inject(ViewContainerRef);
+  private _dir = inject(Directionality, { optional: true });
+  private _changeDetectorRef = inject(ChangeDetectorRef);
+  private popoverService = inject(PopoverService);
 
   ngAfterViewInit() {
     this._checkPopover();
@@ -220,8 +216,8 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     return this._popoverOpen;
   }
 
-  @HostListener('click', ['$event'])
-  onClick(event: MouseEvent): void {
+  @HostListener('click')
+  onClick(): void {
     if (this.popover.triggerEvent === 'click') {
       if (this.closeOnClickTrigger) {
         this.togglePopover();
@@ -231,8 +227,8 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     }
   }
 
-  @HostListener('mouseenter', ['$event'])
-  onMouseEnter(event: MouseEvent): void {
+  @HostListener('mouseenter')
+  onMouseEnter(): void {
     this._halt = false;
     if (this.popover.triggerEvent === 'hover') {
       this._mouseoverTimer = setTimeout(() => {
@@ -241,8 +237,8 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     }
   }
 
-  @HostListener('mouseleave', ['$event'])
-  onMouseLeave(event: MouseEvent): void {
+  @HostListener('mouseleave')
+  onMouseLeave(): void {
     if (this.popover.triggerEvent === 'hover') {
       if (this._mouseoverTimer) {
         clearTimeout(this._mouseoverTimer);
@@ -323,7 +319,10 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   private _subscribeToBackdrop(): void {
     if (this._overlayRef) {
       /** Only subscribe to backdrop if trigger event is click */
-      if (this.triggerEvent === 'click' && this.backdropCloseOnClick === true) {
+      if (
+        this.popover.triggerEvent === 'click' &&
+        this.backdropCloseOnClick === true
+      ) {
         this._overlayRef
           .backdropClick()
           .pipe(takeUntil(this.popoverClosed), takeUntil(this._onDestroy))
@@ -429,8 +428,12 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     const overlayState = new OverlayConfig();
     overlayState.positionStrategy = this._getPositionStrategy();
 
-    /** Display overlay backdrop if trigger event is click */
-    if (this.triggerEvent === 'click') {
+    /**
+     * Display overlay backdrop if the effective trigger event is click.
+     * `mdePopoverTriggerOn` may be set on the popover rather than the trigger,
+     * so the popover's triggerEvent is the value that click handling uses.
+     */
+    if (this.popover.triggerEvent === 'click') {
       overlayState.hasBackdrop = true;
       overlayState.backdropClass = 'cdk-overlay-transparent-backdrop';
     }

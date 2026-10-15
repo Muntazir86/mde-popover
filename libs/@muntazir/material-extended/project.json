@@ -3,7 +3,8 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/@muntazir/material-extended/src",
-  "prefix": "lib",
+  "prefix": "mde",
+  "tags": ["type:lib", "scope:popover"],
   "targets": {
     "build": {
       "executor": "@nx/angular:package",
@@ -24,6 +25,15 @@
       "options": {
         "tsConfig": "libs/@muntazir/material-extended/tsconfig.spec.json",
         "polyfills": ["zone.js", "zone.js/testing"]
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "{projectRoot}/**/*.ts",
+          "{projectRoot}/**/*.html"
+        ]
       }
     }
   }

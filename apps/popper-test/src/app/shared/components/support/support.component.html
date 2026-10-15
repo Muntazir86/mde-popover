@@ -1,7 +1,13 @@
-<div class="google-chat">
+<div class="google-chat" data-testid="support-chat">
   <div class="toolbar">
     <div class="settings">
-      <button button-plain mdTooltip="Settings" mdTooltipPosition="below">
+      <button
+        button-plain
+        type="button"
+        aria-label="Settings"
+        mdTooltip="Settings"
+        mdTooltipPosition="below"
+      >
         <mat-icon>settings</mat-icon>
       </button>
     </div>
@@ -9,7 +15,13 @@
     <div class="title">Lounge</div>
 
     <div class="clear">
-      <button button-plain mdTooltip="Close" mdTooltipPosition="below">
+      <button
+        button-plain
+        type="button"
+        aria-label="Close chat"
+        mdTooltip="Close"
+        mdTooltipPosition="below"
+      >
         <mat-icon>close</mat-icon>
       </button>
     </div>
@@ -19,6 +31,8 @@
     <li class="other">
       <div class="avatar">
         <img
+          data-testid="support-avatar"
+          alt="Timothy"
           src="assets/images/avatar-indigo.svg"
           [mdePopoverTriggerFor]="userPopover"
           mdePopoverPositionX="after"
@@ -39,6 +53,8 @@
     <li class="self">
       <div class="avatar">
         <img
+          data-testid="support-avatar"
+          alt="You"
           src="assets/images/avatar-red.svg"
           [mdePopoverTriggerFor]="userPopover"
           mdePopoverPositionX="before"
@@ -60,6 +76,8 @@
     <li class="other">
       <div class="avatar">
         <img
+          data-testid="support-avatar"
+          alt="Timothy"
           src="assets/images/avatar-indigo.svg"
           [mdePopoverTriggerFor]="userPopover"
           mdePopoverPositionX="after"
@@ -81,6 +99,8 @@
     <li class="self">
       <div class="avatar">
         <img
+          data-testid="support-avatar"
+          alt="You"
           src="assets/images/avatar-red.svg"
           [mdePopoverTriggerFor]="userPopover"
           mdePopoverPositionX="before"
@@ -101,6 +121,8 @@
     <li class="self">
       <div class="avatar">
         <img
+          data-testid="support-avatar"
+          alt="You"
           src="assets/images/avatar-red.svg"
           [mdePopoverTriggerFor]="userPopover"
           mdePopoverPositionX="before"
@@ -122,6 +144,8 @@
     <li class="other">
       <div class="avatar">
         <img
+          data-testid="support-avatar"
+          alt="Timothy"
           src="assets/images/avatar-indigo.svg"
           [mdePopoverTriggerFor]="userPopover"
           mdePopoverPositionX="after"
@@ -142,15 +166,26 @@
 
   <div class="form">
     <mat-form-field style="width: 100%; margin-bottom: -10px">
-      <input matInput placeholder="Message" cdkFocusInitial />
+      <input
+        matInput
+        data-testid="support-message"
+        aria-label="Message"
+        placeholder="Message"
+        cdkFocusInitial
+      />
     </mat-form-field>
   </div>
 </div>
 
 <mde-popover #userPopover="mdePopover">
-  <mat-card style="width: 200px">
+  <mat-card style="width: 200px" data-testid="support-user-card">
     <mat-card-header>
-      <img mat-card-avatar src="assets/images/avatar-indigo.svg" />
+      <img
+        mat-card-avatar
+        data-testid="support-user-avatar"
+        alt="Joe Blogs"
+        src="assets/images/avatar-indigo.svg"
+      />
       <mat-card-title>Joe Blogs</mat-card-title>
       <mat-card-subtitle>Angular</mat-card-subtitle>
     </mat-card-header>

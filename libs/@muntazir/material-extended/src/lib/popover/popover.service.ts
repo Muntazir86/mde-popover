@@ -6,10 +6,8 @@ import {
   VerticalConnectionPos,
 } from '@angular/cdk/overlay';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PopoverService {
-  constructor() {}
-
   /** Get fallback positions based around target alignments. */
   getFallbacks(
     hTarget: MdePopoverPositionX,

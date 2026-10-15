@@ -1,27 +1,23 @@
-import {
-  Component,
-  ElementRef,
-  HostBinding,
-  model,
-} from '@angular/core';
+import { Component, HostBinding, model } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
-    selector: 'theme-picker',
+    selector: 'app-theme-picker',
     templateUrl: './theme-picker.component.html',
     styleUrls: ['./theme-picker.component.scss'],
     imports: [MatButton, NgStyle, MatIcon]
 })
 export class ThemePickerComponent {
-  hovering: any = null;
+  hovering: string | null = null;
 
   @HostBinding('class.mat-elevation-z4') elevation = true;
 
-  items: any = [
+  items: ThemeOption[] = [
     {
       className: 'indigo-pink-theme',
+      label: 'Indigo and pink',
       styles: {
         'background-color': '#6750A4',  // M3 violet-50
         background:
@@ -38,6 +34,7 @@ export class ThemePickerComponent {
     // },
     {
       className: 'pink-bluegrey-theme',
+      label: 'Pink and blue grey',
       styles: {
         'background-color': '#AB2E5C',  // M3 rose-50 (dark)
         background:
@@ -54,6 +51,7 @@ export class ThemePickerComponent {
     // },
     {
       className: 'indigo-grey-theme',
+      label: 'Indigo and grey',
       styles: {
         'background-color': '#6750A4',  // M3 violet-50
         background:
@@ -62,6 +60,7 @@ export class ThemePickerComponent {
     },
     {
       className: 'purple-green-theme',
+      label: 'Purple and green',
       styles: {
         'background-color': '#8559A5',  // M3 violet-50 (dark)
         background:
@@ -70,6 +69,7 @@ export class ThemePickerComponent {
     },
     {
       className: 'cyan-orange-theme',
+      label: 'Cyan and orange',
       styles: {
         'background-color': '#00ACC1',  // M3 cyan-50 (dark)
         background:
@@ -78,6 +78,7 @@ export class ThemePickerComponent {
     },
     {
       className: 'custom-dark-theme',
+      label: 'Custom dark',
       styles: {
         'background-color': '#CA9577',  // Custom primary color (warm terracotta)
         background:
@@ -130,12 +131,15 @@ export class ThemePickerComponent {
   //   this.themeChange.emit(this.themeValue);
   // }
 
-  onItemKeydown(event, className = null) {
-    const next = new ElementRef(event.nextSibling);
-
-    if (event.keyCode === 9) {
-      console.log('onItemKeydown', event);
-      this.hovering = className;
+  onItemKeydown(event: KeyboardEvent) {
+    if (event.key === 'Tab') {
+      this.hovering = null;
     }
   }
+}
+
+interface ThemeOption {
+  className: string;
+  label: string;
+  styles: Record<string, string>;
 }

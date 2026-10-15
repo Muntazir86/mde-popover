@@ -20,8 +20,6 @@ import { NgClass } from '@angular/common';
 export class PageExamplesBuilderComponent {
   alignButton = 'align-left';
 
-  popover;
-
   popoverPositionX: MdePopoverPositionX = 'before';
   popoverPositionY: MdePopoverPositionY = 'above';
 
@@ -38,8 +36,6 @@ export class PageExamplesBuilderComponent {
   value = 0;
   vertical = false;
 
-  constructor() {}
-
   get tickInterval(): number | 'auto' {
     return this.showTicks ? (this.autoTicks ? 'auto' : this._tickInterval) : 0;
   }
@@ -49,6 +45,20 @@ export class PageExamplesBuilderComponent {
   private _tickInterval = 1;
 
   resetForm() {
-    // to do.. template variable #popoverTrigger, popoverTrigger.reset()
+    this.alignButton = 'align-left';
+    this.popoverPositionX = 'before';
+    this.popoverPositionY = 'above';
+    this.event = 'click';
+    this.autoTicks = false;
+    this.disabled = false;
+    this.invert = false;
+    this.max = 100;
+    this.min = 0;
+    this.showTicks = false;
+    this.step = 1;
+    this.thumbLabel = false;
+    this.value = 0;
+    this.vertical = false;
+    this.tickInterval = 1;
   }
 }

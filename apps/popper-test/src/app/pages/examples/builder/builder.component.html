@@ -1,6 +1,6 @@
 <mat-card>
   <mat-card-content>
-    <h2 class="example-h2">Slider configuration</h2>
+    <h2 class="example-h2" data-testid="builder-heading">Slider configuration</h2>
 
     <section class="example-section">
       <mat-form-field class="full-width">
@@ -125,12 +125,13 @@
                         <mat-button-toggle value="align-center">Center</mat-button-toggle>
                         <mat-button-toggle value="align-right">Right</mat-button-toggle>
                       </mat-button-toggle-group>
-                      <button (click)="resetForm()">RESET</button>
+                      <button type="button" data-testid="builder-reset" (click)="resetForm()">RESET</button>
                     </mat-card-title>
 
                     <div class="">
                       <button
                         class="align-it"
+                        data-testid="builder-trigger"
                         [ngClass]="alignButton"
                         mat-raised-button
                         color="primary"
@@ -152,7 +153,7 @@
                   >
                   <mat-card class="example-card">
                     <mat-card-content>
-                      <p>Click popover, I will close.</p>
+                      <p data-testid="builder-popover-content">Click popover, I will close.</p>
                     </mat-card-content>
                     <mat-card-actions>
                       <button mat-button>LIKE</button>
