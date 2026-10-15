@@ -28,6 +28,7 @@ Angular 21 support landed in [PR #13](https://github.com/Muntazir86/mde-popover/
 - The `classList` getter returns the panel class list.
 - The stray `console.log` in the noop scroll strategy is removed.
 - Position and trigger-event types are re-exported as types only.
+- `mdePopoverCloseOnClickTrigger="false"` works again in click mode. Angular CDK 21 renders overlays in the browser top layer, which kept the backdrop above the trigger; the top layer is now turned off for that case only.
 
 ### Changed
 
