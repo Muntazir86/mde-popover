@@ -160,7 +160,8 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
     return this._overlapTrigger;
   }
   set overlapTrigger(value: boolean) {
-    this._overlapTrigger = value;
+    // Attribute bindings pass the string "false", which must not stay truthy.
+    this._overlapTrigger = coerceBooleanProperty(value);
   }
 
   /** Popover target offset x */
@@ -265,6 +266,9 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
     this._focusTrapAutoCaptureEnabled = coerceBooleanProperty(value);
   }
 
+  /** Classes last applied through the `class` / `classList` inputs. */
+  private _panelClass = '';
+
   /**
    * This method takes classes set on the host md-popover element and applies them on the
    * popover template that displays in the overlay container.  Otherwise, it's difficult
@@ -273,6 +277,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
    */
   @Input('class')
   set panelClass(classes: string) {
+    this._panelClass = classes ?? '';
     if (classes && classes.length) {
       this._classList = classes
         .split(' ')
@@ -294,7 +299,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
    */
   @Input()
   get classList(): string {
-    return this.panelClass;
+    return this._panelClass;
   }
   set classList(classes: string) {
     this.panelClass = classes;

@@ -21,10 +21,22 @@
       "defaultConfiguration": "production"
     },
     "test": {
-      "executor": "@angular-devkit/build-angular:karma",
+      "executor": "@nx/angular:unit-test",
       "options": {
+        "buildTarget": "@muntazir/material-extended:build:development",
         "tsConfig": "libs/@muntazir/material-extended/tsconfig.spec.json",
-        "polyfills": ["zone.js", "zone.js/testing"]
+        "runner": "vitest",
+        "watch": false,
+        "coverage": true,
+        "coverageReporters": ["text", "text-summary", "lcov", "html"],
+        "coverageInclude": ["libs/@muntazir/material-extended/src/**/*.ts"],
+        "coverageExclude": ["**/*.spec.ts"],
+        "coverageThresholds": {
+          "statements": 90,
+          "branches": 90,
+          "functions": 90,
+          "lines": 90
+        }
       }
     },
     "lint": {
