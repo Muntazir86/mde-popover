@@ -1,0 +1,42 @@
+# Manual npm release. Pull requests and pushes do not start this workflow.
+# Requires the NPM_TOKEN repository secret. Dispatch it only to publish.
+
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type publish to version, tag, and publish to npm"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.event.inputs.confirm == 'publish'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Use Node.js 22.14.0
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22.14.0
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - name: Install dependencies
+        run: npm ci
+      - name: Version, changelog, tag, and GitHub release
+        run: npx nx release --skip-publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish to npm
+        run: npx nx release publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

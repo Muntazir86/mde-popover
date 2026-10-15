@@ -1,6 +1,6 @@
 {
   "name": "popover",
-  "version": "9.0.0",
+  "version": "10.0.0",
   "scripts": {
     "ng": "ng",
     "start": "nx serve popper-test",
@@ -13,7 +13,8 @@
     "publish": "npm run build:prod && npm publish --access public ./dist/@muntazir/material-extended",
     "deploy": "nx run popper-test:deploy --base-href=/mde-popover/",
     "watch": "nx build --watch --configuration development",
-    "test": "nx test @muntazir/material-extended --coverage"
+    "test": "nx test @muntazir/material-extended --coverage",
+    "commitlint": "commitlint --from HEAD~1 --to HEAD"
   },
   "private": true,
   "dependencies": {
@@ -39,6 +40,8 @@
     "@angular/build": "^21.1.5",
     "@angular/cli": "21.1.5",
     "@angular/compiler-cli": "21.1.6",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
     "@nx/angular": "22.5.4",
     "@nx/eslint": "^22.5.4",
     "@nx/eslint-plugin": "^22.5.4",

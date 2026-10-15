@@ -85,5 +85,27 @@
     "@schematics/angular:resolver": {
       "typeSeparator": "."
     }
+  },
+  "release": {
+    "projects": ["@muntazir/material-extended"],
+    "projectsRelationship": "fixed",
+    "releaseTag": {
+      "pattern": "v{version}",
+      "checkAllBranchesWhen": ["master"]
+    },
+    "version": {
+      "conventionalCommits": true,
+      "fallbackCurrentVersionResolver": "disk",
+      "manifestRootsToUpdate": ["{projectRoot}", "{workspaceRoot}"],
+      "updateDependents": "never"
+    },
+    "changelog": {
+      "workspaceChangelog": false,
+      "automaticFromRef": true,
+      "projectChangelogs": {
+        "file": "{projectRoot}/CHANGELOG.md",
+        "createRelease": "github"
+      }
+    }
   }
 }

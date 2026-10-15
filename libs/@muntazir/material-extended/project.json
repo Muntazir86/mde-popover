@@ -47,6 +47,14 @@
           "{projectRoot}/**/*.html"
         ]
       }
+    },
+    "nx-release-publish": {
+      "dependsOn": ["build"],
+      "executor": "@nx/js:release-publish",
+      "options": {
+        "packageRoot": "dist/@muntazir/material-extended",
+        "access": "public"
+      }
     }
   }
 }
