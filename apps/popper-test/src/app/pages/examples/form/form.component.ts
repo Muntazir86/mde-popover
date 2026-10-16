@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { MdePopoverTrigger, MdePopoverModule } from '@muntazir/material-extended';
 
 import { FormsModule } from '@angular/forms';
@@ -9,6 +9,9 @@ import { MatInput } from '@angular/material/input';
     selector: 'app-form',
     templateUrl: './form.component.html',
     styleUrls: ['./form.component.scss'],
+    // Mutable demo state; keep the pre-v22 default until it moves to signals.
+    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [FormsModule, MatFormField, MdePopoverModule, MatInput, MatHint]
 })
 export class PageExamplesFormComponent implements OnDestroy {

@@ -1,4 +1,4 @@
-import { Component, inject, Renderer2 } from '@angular/core';
+import { Component, inject, Renderer2, ChangeDetectionStrategy } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatToolbar } from '@angular/material/toolbar';
@@ -18,6 +18,9 @@ export const DEFAULT_THEME = 'indigo-pink-theme';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    // Mutable demo state; keep the pre-v22 default until it moves to signals.
+    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatToolbar, MdePopoverModule, MatButton, MatIconButton, MatIcon, ThemePickerComponent, NotificationsComponent, GithubComponent, MatCard, MatCardContent, MatCardActions, MatFabButton, SupportComponent, RouterOutlet]
 })
 export class AppComponent {

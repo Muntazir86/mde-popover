@@ -1,4 +1,4 @@
-import { Component, EmbeddedViewRef } from '@angular/core';
+import { Component, EmbeddedViewRef, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -9,6 +9,7 @@ import { MdePopoverPositionX, MdePopoverPositionY } from './popover-types';
 @Component({
   selector: 'mde-spec-popover-host',
   imports: [MdePopover],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <mde-popover class="from-host extra" #popover="mdePopover">
       <button type="button" class="inside">Inside</button>

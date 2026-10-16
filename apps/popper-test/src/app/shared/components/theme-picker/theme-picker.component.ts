@@ -1,4 +1,4 @@
-import { Component, HostBinding, model } from '@angular/core';
+import { Component, HostBinding, model, ChangeDetectionStrategy } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { NgStyle } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
@@ -7,6 +7,9 @@ import { MatIcon } from '@angular/material/icon';
     selector: 'app-theme-picker',
     templateUrl: './theme-picker.component.html',
     styleUrls: ['./theme-picker.component.scss'],
+    // Mutable demo state; keep the pre-v22 default until it moves to signals.
+    // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+    changeDetection: ChangeDetectionStrategy.Eager,
     imports: [MatButton, NgStyle, MatIcon]
 })
 export class ThemePickerComponent {

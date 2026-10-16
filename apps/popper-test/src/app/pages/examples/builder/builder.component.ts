@@ -1,4 +1,4 @@
-import { Component, HostListener, ViewChild } from '@angular/core';
+import { Component, HostListener, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import {
   MdePopoverModule,
   MdePopoverPositionX,
@@ -112,6 +112,9 @@ function binding(attr: string, value: unknown): string {
   selector: 'app-builder',
   templateUrl: './builder.component.html',
   styleUrls: ['./builder.component.scss'],
+  // Mutable demo state; keep the pre-v22 default until it moves to signals.
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     FormsModule,
     MatCard,

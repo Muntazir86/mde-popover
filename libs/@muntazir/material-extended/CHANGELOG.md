@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Nx Release prepends generated notes for later versions above this hand-written history. The 5.x–9.x entries were reconstructed from git history and the package manifests on the `5.x`–`9.x` branches. This repository has no git tags for those lines, so the notes only include what those commits and manifests record.
 
+## [11.0.0] - Unreleased
+
+Angular 22 support. The workspace moves to Nx 23.3, Angular and Angular Material/CDK 22.1, and TypeScript 6.0. Node.js 22.22.3 or later (or 24.15+) is required, matching Angular 22. Peer dependencies on `@angular/cdk`, `@angular/common`, and `@angular/core` are `^22.0.0`. Maintenance for Angular 21 continues on the `10.x` branch.
+
+### Breaking
+
+- Requires Angular 22 (`@angular/cdk`, `@angular/common`, `@angular/core` `^22.0.0`).
+
+### Changed
+
+- CDK 22 overlays still render in the browser top layer by default. The popover keeps the 10.0.0 behaviour: it opts out of the top layer only when `mdePopoverCloseOnClickTrigger` is `false` with a click trigger and backdrop close, so the trigger stays clickable above the backdrop.
+- The package description no longer refers to the Angular CLI 20 scaffold.
+- The demo app builds with `@angular/build` instead of the deprecated webpack-based `@angular-devkit/build-angular`. Karma and Jasmine are removed in favour of Vitest.
+- Demo components that hold mutable state opt into `ChangeDetectionStrategy.Eager` because Angular 22 makes `OnPush` the default.
+
+### Deprecated
+
+- `transformPopover` (from `@angular/animations`) stays exported but remains deprecated. Consumers who import it need `@angular/animations`, which Angular 22 marks as deprecated.
+
 ## [10.0.0] - 2026-10-15
 
 Angular 21 support landed in [PR #13](https://github.com/Muntazir86/mde-popover/pull/13). The workspace uses Nx 22.5.4. Node.js 22.14 or later is required. Peer dependencies on `@angular/cdk`, `@angular/common`, and `@angular/core` are `^21.0.0`.
