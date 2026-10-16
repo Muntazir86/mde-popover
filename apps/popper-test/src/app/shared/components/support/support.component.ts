@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { MdePopoverModule } from '@muntazir/material-extended';
 import { MatFormField } from '@angular/material/form-field';
@@ -11,8 +11,4 @@ import { MatCard, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle } 
     styleUrls: ['./support.component.scss'],
     imports: [MatIcon, MdePopoverModule, MatFormField, MatInput, MatCard, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle]
 })
-export class SupportComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class SupportComponent {}

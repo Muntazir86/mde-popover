@@ -7,6 +7,8 @@
   >
     <input
       matInput
+      data-testid="form-company"
+      aria-label="Company"
       placeholder="Company (disabled)"
       disabled
       value="Google"
@@ -27,6 +29,8 @@
         <mat-form-field class="example-full-width">
           <input
             matInput
+            data-testid="form-first-name"
+            aria-label="First name"
             placeholder="First name"
             (focus)="openPopover(nameTarget, 'Your legal First Name.')"
             (blur)="closePopover(nameTarget)"
@@ -37,6 +41,8 @@
         <mat-form-field class="example-full-width">
           <input
             matInput
+            data-testid="form-last-name"
+            aria-label="Last name"
             placeholder="Long Last Name That Will Be Truncated"
             (focus)="openPopover(nameTarget, 'Your legal Last Name.')"
             (blur)="closePopover(nameTarget)"
@@ -56,7 +62,7 @@
     [mdePopoverOffsetY]="0"
     [mdePopoverOffsetX]="250"
   >
-    <div class="input-popover mat-elevation-z1">
+    <div class="input-popover mat-elevation-z1" data-testid="form-help">
       {{ popoverText }}
     </div>
   </mde-popover>
@@ -69,6 +75,8 @@
     <mat-form-field class="example-full-width">
       <textarea
         matInput
+        data-testid="form-address"
+        aria-label="Address"
         placeholder="Address"
         (focus)="openPopover(addressTarget, 'Your home address line 1.')"
         (blur)="closePopover(addressTarget)"
@@ -79,6 +87,8 @@
     <mat-form-field class="example-full-width">
       <textarea
         matInput
+        data-testid="form-address-2"
+        aria-label="Address 2"
         placeholder="Address 2"
         (focus)="openPopover(addressTarget, 'Your home address line 2.')"
         (blur)="closePopover(addressTarget)"
@@ -92,6 +102,8 @@
         <mat-form-field class="example-full-width">
           <input
             matInput
+            data-testid="form-city"
+            aria-label="City"
             placeholder="City"
             (focus)="openPopover(addressTarget, 'What\'s your home City?')"
             (blur)="closePopover(addressTarget)"
@@ -102,6 +114,8 @@
         <mat-form-field class="example-full-width">
           <input
             matInput
+            data-testid="form-state"
+            aria-label="State"
             placeholder="State"
             (focus)="openPopover(addressTarget, 'What\'s your home State?')"
             (blur)="closePopover(addressTarget)"
@@ -113,6 +127,8 @@
           <input
             matInput
             #postalCode
+            data-testid="form-postal-code"
+            aria-label="Postal Code"
             maxlength="5"
             placeholder="Postal Code"
             value="94043"

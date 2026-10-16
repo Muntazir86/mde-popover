@@ -1,8 +1,10 @@
-<div class="container" (keydown)="onItemKeydown($event)">
-  @for (item of items; track item; let i = $index; let last = $last) {
+<div class="container" tabindex="-1" (keydown)="onItemKeydown($event)">
+  @for (item of items; track item.className) {
     <button
       mat-button
       class="item"
+      [attr.data-testid]="'theme-' + item.className"
+      [attr.aria-label]="item.label"
       [ngStyle]="item.styles"
       [class.current]="theme() === item.className"
       (click)="theme.set(item.className)"

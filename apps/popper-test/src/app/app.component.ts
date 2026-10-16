@@ -21,7 +21,7 @@ export const DEFAULT_THEME = 'indigo-pink-theme';
     imports: [MatToolbar, MdePopoverModule, MatButton, MatIconButton, MatIcon, ThemePickerComponent, NotificationsComponent, GithubComponent, MatCard, MatCardContent, MatCardActions, MatFabButton, SupportComponent, RouterOutlet]
 })
 export class AppComponent {
-  private _themeClass: string = DEFAULT_THEME;
+  private _themeClass = DEFAULT_THEME;
   private overlayContainer = inject(OverlayContainer);
   private renderer = inject(Renderer2);
   private document = inject(DOCUMENT);

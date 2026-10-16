@@ -5,12 +5,12 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
-  Optional,
   Output,
   ViewContainerRef,
   HostListener,
   HostBinding,
   ChangeDetectorRef,
+  inject,
 } from '@angular/core';
 
 import { isFakeMousedownFromScreenReader } from '@angular/cdk/a11y';
@@ -32,8 +32,6 @@ import {
   MdePopoverPositionY,
   MdePopoverTriggerEvent,
   MdePopoverScrollStrategy,
-  VALID_PositionX,
-  VALID_PositionY,
 } from './popover-types';
 import { throwMdePopoverMissingError } from './popover-errors';
 import { takeUntil } from 'rxjs/operators';
@@ -47,25 +45,26 @@ import { PopoverService } from './popover.service';
 @Directive({
     selector: '[mdePopoverTriggerFor]',
     exportAs: 'mdePopoverTrigger',
-    standalone: false
 })
 export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
-  // tslint:disable-line:directive-class-suffix
 
   @HostBinding('attr.aria-haspopup') ariaHaspopup = true;
 
   popoverOpened = new Subject<void>();
   popoverClosed = new Subject<void>();
 
-  private _portal: TemplatePortal<any>;
+  private _portal: TemplatePortal<void>;
   private _overlayRef: OverlayRef | null = null;
   private _popoverOpen = false;
   private _halt = false;
-  private _backdropSubscription: Subscription;
-  private _positionSubscription: Subscription;
-  private _detachmentsSubscription: Subscription;
+  private _backdropSubscription: Subscription | null = null;
+  private _positionSubscription: Subscription | null = null;
+  private _detachmentsSubscription: Subscription | null = null;
+  private _closeSubscription: Subscription | null = null;
 
-  private _mouseoverTimer: any;
+  private _mouseoverTimer: ReturnType<typeof setTimeout> | null = null;
+  private _mouseleaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private _destroyed = false;
 
   // tracking input type is necessary so it's possible to only auto-focus
   // the first item of the list when the popover is opened via the keyboard
@@ -122,10 +121,10 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   @Input('mdePopoverBackdropCloseOnClick') backdropCloseOnClick = true;
 
   /** Disables popover trigger */
-  @Input('mdeDisablePopoverTrigger') disablePopoverTrigger: boolean = false;
+  @Input('mdeDisablePopoverTrigger') disablePopoverTrigger = false;
 
   /** Popver container close on click of trigger, when trigger event is click */
-  @Input('mdePopoverCloseOnClickTrigger') closeOnClickTrigger: boolean = true;
+  @Input('mdePopoverCloseOnClickTrigger') closeOnClickTrigger = true;
 
   /** Event emitted when the associated popover is opened. */
   @Output() opened = new EventEmitter<void>();
@@ -133,19 +132,19 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   /** Event emitted when the associated popover is closed. */
   @Output() closed = new EventEmitter<void>();
 
-  constructor(
-    private _overlay: Overlay,
-    public _elementRef: ElementRef,
-    private _viewContainerRef: ViewContainerRef,
-    @Optional() private _dir: Directionality,
-    private _changeDetectorRef: ChangeDetectorRef,
-    private popoverService: PopoverService
-  ) {}
+  private _overlay = inject(Overlay);
+  _elementRef = inject(ElementRef);
+  private _viewContainerRef = inject(ViewContainerRef);
+  private _dir = inject(Directionality, { optional: true });
+  private _changeDetectorRef = inject(ChangeDetectorRef);
+  private popoverService = inject(PopoverService);
 
   ngAfterViewInit() {
     this._checkPopover();
     this._setCurrentConfig();
-    this.popover.close.subscribe(() => this.closePopover());
+    this._closeSubscription = this.popover.close
+      .pipe(takeUntil(this._onDestroy))
+      .subscribe(() => this.closePopover());
   }
 
   ngOnDestroy() {
@@ -153,11 +152,14 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   }
 
   private _setCurrentConfig() {
-    if (VALID_PositionX.includes(this.positionX)) {
+    // Pass every provided value through, including 0. A truthy check dropped
+    // documented numeric values such as a 0ms delay or a 0px offset.
+    // Invalid positions throw from the popover setters.
+    if (this.positionX != null) {
       this.popover.positionX = this.positionX;
     }
 
-    if (VALID_PositionY.includes(this.positionY)) {
+    if (this.positionY != null) {
       this.popover.positionY = this.positionY;
     }
 
@@ -165,35 +167,35 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
       this.popover.triggerEvent = this.triggerEvent;
     }
 
-    if (this.enterDelay) {
+    if (this.enterDelay != null) {
       this.popover.enterDelay = this.enterDelay;
     }
 
-    if (this.leaveDelay) {
+    if (this.leaveDelay != null) {
       this.popover.leaveDelay = this.leaveDelay;
     }
 
-    if (this.overlapTrigger === true || this.overlapTrigger === false) {
+    if (this.overlapTrigger != null) {
       this.popover.overlapTrigger = this.overlapTrigger;
     }
 
-    if (this.targetOffsetX) {
+    if (this.targetOffsetX != null) {
       this.popover.targetOffsetX = this.targetOffsetX;
     }
 
-    if (this.targetOffsetY) {
+    if (this.targetOffsetY != null) {
       this.popover.targetOffsetY = this.targetOffsetY;
     }
 
-    if (this.arrowOffsetX) {
+    if (this.arrowOffsetX != null) {
       this.popover.arrowOffsetX = this.arrowOffsetX;
     }
 
-    if (this.arrowOffsetY) {
+    if (this.arrowOffsetY != null) {
       this.popover.arrowOffsetY = this.arrowOffsetY;
     }
 
-    if (this.arrowWidth) {
+    if (this.arrowWidth != null) {
       this.popover.arrowWidth = this.arrowWidth;
     }
 
@@ -201,12 +203,15 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
       this.popover.arrowColor = this.arrowColor;
     }
 
-    if (this.closeOnClick === true || this.closeOnClick === false) {
+    if (this.closeOnClick != null) {
       this.popover.closeOnClick = this.closeOnClick;
     }
+    // `mdePopoverTriggerOn` may live on the popover. Click handling already
+    // reads popover.triggerEvent, and the trigger has to stay above a click
+    // backdrop in the same case.
     if (
       !this.closeOnClickTrigger &&
-      this.triggerEvent === 'click' &&
+      this.popover.triggerEvent === 'click' &&
       this.backdropCloseOnClick
     ) {
       this._elementRef.nativeElement.style.zIndex = '999999';
@@ -220,8 +225,8 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     return this._popoverOpen;
   }
 
-  @HostListener('click', ['$event'])
-  onClick(event: MouseEvent): void {
+  @HostListener('click')
+  onClick(): void {
     if (this.popover.triggerEvent === 'click') {
       if (this.closeOnClickTrigger) {
         this.togglePopover();
@@ -231,25 +236,28 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     }
   }
 
-  @HostListener('mouseenter', ['$event'])
-  onMouseEnter(event: MouseEvent): void {
+  @HostListener('mouseenter')
+  onMouseEnter(): void {
     this._halt = false;
+    // Returning to the trigger cancels a close that was waiting on leaveDelay.
+    this._clearTimer('_mouseleaveTimer');
     if (this.popover.triggerEvent === 'hover') {
+      this._clearTimer('_mouseoverTimer');
       this._mouseoverTimer = setTimeout(() => {
+        this._mouseoverTimer = null;
         this.openPopover();
       }, this.popover.enterDelay);
     }
   }
 
-  @HostListener('mouseleave', ['$event'])
-  onMouseLeave(event: MouseEvent): void {
+  @HostListener('mouseleave')
+  onMouseLeave(): void {
     if (this.popover.triggerEvent === 'hover') {
-      if (this._mouseoverTimer) {
-        clearTimeout(this._mouseoverTimer);
-        this._mouseoverTimer = null;
-      }
+      this._clearTimer('_mouseoverTimer');
       if (this._popoverOpen) {
-        setTimeout(() => {
+        this._clearTimer('_mouseleaveTimer');
+        this._mouseleaveTimer = setTimeout(() => {
+          this._mouseleaveTimer = null;
           if (!this.popover.closeDisabled) {
             this.closePopover();
           }
@@ -282,7 +290,7 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     if (this._overlayRef) {
       this._overlayRef.detach();
       this._resetPopover();
-      if (!this.closeOnClickTrigger && this.triggerEvent === 'click') {
+      if (!this.closeOnClickTrigger && this.popover.triggerEvent === 'click') {
         this._elementRef.nativeElement.blur();
       }
     }
@@ -290,18 +298,34 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
 
   /** Removes the popover from the DOM. */
   destroyPopover(): void {
-    if (this._mouseoverTimer) {
-      clearTimeout(this._mouseoverTimer);
-      this._mouseoverTimer = null;
-    }
+    this._clearHoverTimers();
     if (this._overlayRef) {
       this._overlayRef.dispose();
       this._overlayRef = null;
-      this._cleanUpSubscriptions();
     }
+    this._cleanUpSubscriptions();
 
-    this._onDestroy.next();
-    this._onDestroy.complete();
+    // ngOnDestroy also calls this, so a manual destroy must not complete twice.
+    if (!this._destroyed) {
+      this._destroyed = true;
+      this._onDestroy.next();
+      this._onDestroy.complete();
+    }
+  }
+
+  private _clearTimer(
+    field: '_mouseoverTimer' | '_mouseleaveTimer'
+  ): void {
+    const timer = this[field];
+    if (timer) {
+      clearTimeout(timer);
+      this[field] = null;
+    }
+  }
+
+  private _clearHoverTimers(): void {
+    this._clearTimer('_mouseoverTimer');
+    this._clearTimer('_mouseleaveTimer');
   }
 
   /** Focuses the popover trigger. */
@@ -321,10 +345,15 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
    * explicitly when the popover is closed or destroyed.
    */
   private _subscribeToBackdrop(): void {
+    this._backdropSubscription?.unsubscribe();
+    this._backdropSubscription = null;
     if (this._overlayRef) {
       /** Only subscribe to backdrop if trigger event is click */
-      if (this.triggerEvent === 'click' && this.backdropCloseOnClick === true) {
-        this._overlayRef
+      if (
+        this.popover.triggerEvent === 'click' &&
+        this.backdropCloseOnClick === true
+      ) {
+        this._backdropSubscription = this._overlayRef
           .backdropClick()
           .pipe(takeUntil(this.popoverClosed), takeUntil(this._onDestroy))
           .subscribe(() => {
@@ -335,8 +364,10 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   }
 
   private _subscribeToDetachments(): void {
+    this._detachmentsSubscription?.unsubscribe();
+    this._detachmentsSubscription = null;
     if (this._overlayRef) {
-      this._overlayRef
+      this._detachmentsSubscription = this._overlayRef
         .detachments()
         .pipe(takeUntil(this.popoverClosed), takeUntil(this._onDestroy))
         .subscribe(() => {
@@ -365,7 +396,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     // A "none" trigger is opened programmatically while focus stays on some other
     // element (an input inside or beside the host). Moving focus onto the host
     // pulls it away from that element.
-    if (!this._openedByMouse && this.triggerEvent !== 'none') {
+    // Use the popover's event so `mdePopoverTriggerOn="none"` on the popover
+    // (not only on the trigger) keeps focus on the field that opened it.
+    if (!this._openedByMouse && this.popover.triggerEvent !== 'none') {
       this.focus();
     }
     this._openedByMouse = false;
@@ -429,10 +462,20 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     const overlayState = new OverlayConfig();
     overlayState.positionStrategy = this._getPositionStrategy();
 
-    /** Display overlay backdrop if trigger event is click */
-    if (this.triggerEvent === 'click') {
+    /**
+     * Display overlay backdrop if the effective trigger event is click.
+     * `mdePopoverTriggerOn` may be set on the popover rather than the trigger,
+     * so the popover's triggerEvent is the value that click handling uses.
+     */
+    if (this.popover.triggerEvent === 'click') {
       overlayState.hasBackdrop = true;
       overlayState.backdropClass = 'cdk-overlay-transparent-backdrop';
+      // Since CDK 21 overlays render in the browser top layer (native popover), which no
+      // z-index can rise above. Keep this overlay in the regular stacking order when the
+      // trigger has to stay clickable above the backdrop.
+      if (!this.closeOnClickTrigger && this.backdropCloseOnClick) {
+        overlayState.usePopover = false;
+      }
     }
 
     overlayState.direction = this.dir;
@@ -451,7 +494,6 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   ): ScrollStrategy {
     switch (strategy) {
       case 'noop':
-        console.log('noop');
         return this._overlay.scrollStrategies.noop();
       case 'close':
         return this._overlay.scrollStrategies.close();
@@ -569,15 +611,14 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   }
 
   private _cleanUpSubscriptions(): void {
-    if (this._backdropSubscription) {
-      this._backdropSubscription.unsubscribe();
-    }
-    if (this._positionSubscription) {
-      this._positionSubscription.unsubscribe();
-    }
-    if (this._detachmentsSubscription) {
-      this._detachmentsSubscription.unsubscribe();
-    }
+    this._backdropSubscription?.unsubscribe();
+    this._backdropSubscription = null;
+    this._positionSubscription?.unsubscribe();
+    this._positionSubscription = null;
+    this._detachmentsSubscription?.unsubscribe();
+    this._detachmentsSubscription = null;
+    this._closeSubscription?.unsubscribe();
+    this._closeSubscription = null;
   }
 
   @HostListener('mousedown', ['$event']) _handleMousedown(

@@ -1,3 +1,4 @@
+import { NgClass, NgStyle } from '@angular/common';
 import {
   Component,
   EventEmitter,
@@ -14,6 +15,7 @@ import {
   NgZone,
   inject,
 } from '@angular/core';
+import { CdkTrapFocus } from '@angular/cdk/a11y';
 
 
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
@@ -40,10 +42,9 @@ import { MdePopoverPanel } from './popover-interfaces';
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
     exportAs: 'mdePopover',
-    standalone: false
+    imports: [NgClass, NgStyle, CdkTrapFocus],
 })
 export class MdePopover implements MdePopoverPanel, OnDestroy {
-  // tslint:disable-line:component-class-suffix
 
   @HostBinding('attr.role') role = 'dialog';
 
@@ -77,13 +78,13 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
   public closeDisabled = false;
 
   /** Config object to be passed into the popover's arrow ngStyle */
-  public popoverPanelStyles: {};
+  public popoverPanelStyles: Record<string, string> = {};
 
   /** Config object to be passed into the popover's arrow ngStyle */
-  public popoverArrowStyles: {};
+  public popoverArrowStyles: Record<string, string> = {};
 
   /** Config object to be passed into the popover's content ngStyle */
-  public popoverContentStyles: {};
+  public popoverContentStyles: Record<string, string> = {};
 
   /** Emits when the enter animation completes. */
   _onEnterAnimationComplete = new EventEmitter<void>();
@@ -159,7 +160,8 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
     return this._overlapTrigger;
   }
   set overlapTrigger(value: boolean) {
-    this._overlapTrigger = value;
+    // Attribute bindings pass the string "false", which must not stay truthy.
+    this._overlapTrigger = coerceBooleanProperty(value);
   }
 
   /** Popover target offset x */
@@ -264,6 +266,9 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
     this._focusTrapAutoCaptureEnabled = coerceBooleanProperty(value);
   }
 
+  /** Classes last applied through the `class` / `classList` inputs. */
+  private _panelClass = '';
+
   /**
    * This method takes classes set on the host md-popover element and applies them on the
    * popover template that displays in the overlay container.  Otherwise, it's difficult
@@ -272,10 +277,11 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
    */
   @Input('class')
   set panelClass(classes: string) {
+    this._panelClass = classes ?? '';
     if (classes && classes.length) {
       this._classList = classes
         .split(' ')
-        .reduce((obj: any, className: string) => {
+        .reduce((obj: Record<string, boolean>, className: string) => {
           obj[className] = true;
           return obj;
         }, {});
@@ -293,7 +299,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
    */
   @Input()
   get classList(): string {
-    return this.panelClass;
+    return this._panelClass;
   }
   set classList(classes: string) {
     this.panelClass = classes;
@@ -302,7 +308,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
   /** Event emitted when the popover is closed. */
   @Output() close = new EventEmitter<void>();
 
-  @ViewChild(TemplateRef) templateRef!: TemplateRef<any>;
+  @ViewChild(TemplateRef) templateRef!: TemplateRef<void>;
 
   private _elementRef = inject(ElementRef);
   public zone = inject(NgZone);
@@ -329,6 +335,10 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
    * trigger will close the popover.
    */
   _emitCloseEvent(): void {
+    // Hovering the panel sets closeDisabled. A click (or Esc) can dismiss the
+    // panel before mouseleave runs, and the flag has to be cleared or the next
+    // hover open will ignore the trigger's leave timer.
+    this.closeDisabled = false;
     this.close.emit();
   }
 

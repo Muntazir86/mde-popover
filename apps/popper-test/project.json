@@ -4,6 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/popper-test/src",
   "prefix": "app",
+  "tags": ["type:app", "scope:demo"],
   "generators": {
     "@schematics/angular:component": {
       "style": "scss"
@@ -83,6 +84,15 @@
         ],
         "styles": ["apps/popper-test/src/styles.scss"],
         "scripts": []
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "{projectRoot}/**/*.ts",
+          "{projectRoot}/**/*.html"
+        ]
       }
     },
     "deploy": {
