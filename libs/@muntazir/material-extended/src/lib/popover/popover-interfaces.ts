@@ -24,7 +24,7 @@ export interface MdePopoverPanel {
   closeOnClick: boolean;
   closeDisabled: boolean;
   setCurrentStyles: () => void;
-  templateRef: TemplateRef<any>;
+  templateRef: TemplateRef<void>;
   close: EventEmitter<void>;
   zone: NgZone;
   setPositionClasses: (x: MdePopoverPositionX, y: MdePopoverPositionY) => void;

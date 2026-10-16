@@ -1,13 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-    selector: 'page-error',
+    selector: 'app-page-error',
     templateUrl: './error.component.html',
     styleUrls: ['./error.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PageErrorComponent implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class PageErrorComponent {}

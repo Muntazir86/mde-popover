@@ -58,7 +58,7 @@ export class PageExamplesFormComponent implements OnDestroy {
   }
 
   private clearCloseTimer() {
-    if (this.closeTimeout != null) {
+    if (this.closeTimeout !== null) {
       clearTimeout(this.closeTimeout);
       this.closeTimeout = null;
     }

@@ -17,8 +17,17 @@
       "cache": true
     },
     "test": {
-      "inputs": ["default", "^production", "{workspaceRoot}/karma.conf.js"],
+      "inputs": ["default", "^production"],
       "cache": true
+    },
+    "lint": {
+      "cache": true,
+      "inputs": [
+        "default",
+        "{workspaceRoot}/eslint.config.mjs",
+        "{workspaceRoot}/apps/popper-test/eslint.config.mjs",
+        "{workspaceRoot}/libs/@muntazir/material-extended/eslint.config.mjs"
+      ]
     }
   },
   "generators": {
@@ -75,6 +84,28 @@
     },
     "@schematics/angular:resolver": {
       "typeSeparator": "."
+    }
+  },
+  "release": {
+    "projects": ["@muntazir/material-extended"],
+    "projectsRelationship": "fixed",
+    "releaseTag": {
+      "pattern": "v{version}",
+      "checkAllBranchesWhen": ["master"]
+    },
+    "version": {
+      "conventionalCommits": true,
+      "fallbackCurrentVersionResolver": "disk",
+      "manifestRootsToUpdate": ["{projectRoot}", "."],
+      "updateDependents": "never"
+    },
+    "changelog": {
+      "workspaceChangelog": false,
+      "automaticFromRef": true,
+      "projectChangelogs": {
+        "file": "{projectRoot}/CHANGELOG.md",
+        "createRelease": "github"
+      }
     }
   }
 }

@@ -1,162 +1,220 @@
-<mat-card>
-  <mat-card-content>
-    <h2 class="example-h2">Slider configuration</h2>
+<div class="playground">
+  <header class="playground-header">
+    <h2 data-testid="builder-heading">Popover playground</h2>
+    <p>
+      Configure every <code>mde-popover</code> input, try it in the preview,
+      and copy the matching template.
+    </p>
+  </header>
 
-    <section class="example-section">
-      <mat-form-field class="full-width">
-        <mat-label>&#64;Input('mdePopoverTriggerOn') triggerEvent</mat-label>
-        <mat-select [(ngModel)]="event" (selectionChange)="resetForm()">
-          <mat-option value="click">Click</mat-option>
-          <mat-option value="hover">Hover</mat-option>
+  <mat-card class="controls" appearance="outlined">
+    <mat-card-content>
+      <h3>Trigger</h3>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>mdePopoverTriggerOn</mat-label>
+        <mat-select [(ngModel)]="config.triggerOn" data-testid="builder-trigger-on">
+          <mat-option value="click">click</mat-option>
+          <mat-option value="hover">hover</mat-option>
+          <mat-option value="none">none (open from code)</mat-option>
         </mat-select>
       </mat-form-field>
-    </section>
+      <mat-slide-toggle [(ngModel)]="config.disableTrigger" data-testid="builder-disable-trigger">
+        Disable trigger <code>mdeDisablePopoverTrigger</code>
+      </mat-slide-toggle>
 
-    <section class="example-section">
-      <mat-form-field class="full-width">
-        <mat-label>&#64;Input('mdePopoverPositionX') positionX</mat-label>
-        <mat-select
-          [(ngModel)]="popoverPositionX"
-          (selectionChange)="resetForm()"
-          >
-          <mat-option value="before">before</mat-option>
-          <mat-option value="after">after</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </section>
-
-    <section class="example-section">
-      <mat-form-field class="full-width">
-        <mat-label>&#64;Input('mdePopoverPositionY') positionY</mat-label>
-        <mat-select
-          [(ngModel)]="popoverPositionY"
-          (selectionChange)="resetForm()"
-          >
-          <mat-option value="above">above</mat-option>
-          <mat-option value="below">below</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </section>
-
-    <section class="example-section">
-      <mat-checkbox class="example-margin" [(ngModel)]="showTicks"
-        >Show ticks</mat-checkbox
-        >
-        @if (showTicks) {
-          <mat-checkbox
-            class="example-margin"
-            [(ngModel)]="autoTicks"
-            >
-            Open
-          </mat-checkbox>
-        }
-        @if (showTicks && !autoTicks) {
-          <mat-form-field class="example-margin">
-            <input
-              matInput
-              type="number"
-              placeholder="Tick interval"
-              [(ngModel)]="tickInterval"
-              />
-            </mat-form-field>
-          }
-        </section>
-
-        <section class="example-section">
-          <mat-checkbox class="example-margin" [(ngModel)]="showTicks"
-            >Show ticks</mat-checkbox
-            >
-            @if (showTicks) {
-              <mat-checkbox
-                class="example-margin"
-                [(ngModel)]="autoTicks"
-                >
-                Auto ticks
-              </mat-checkbox>
+      <h3>Position</h3>
+      <div class="row">
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverPositionX</mat-label>
+          <mat-select [(ngModel)]="config.positionX" data-testid="builder-position-x">
+            @for (o of positionXOptions; track o) {
+              <mat-option [value]="o">{{ o }}</mat-option>
             }
-            @if (showTicks && !autoTicks) {
-              <mat-form-field class="example-margin">
-                <input
-                  matInput
-                  type="number"
-                  placeholder="Tick interval"
-                  [(ngModel)]="tickInterval"
-                  />
-                </mat-form-field>
-              }
-            </section>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverPositionY</mat-label>
+          <mat-select [(ngModel)]="config.positionY" data-testid="builder-position-y">
+            @for (o of positionYOptions; track o) {
+              <mat-option [value]="o">{{ o }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverOffsetX</mat-label>
+          <input matInput type="number" [(ngModel)]="config.offsetX" data-testid="builder-offset-x" />
+          <span matTextSuffix>px</span>
+        </mat-form-field>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverOffsetY</mat-label>
+          <input matInput type="number" [(ngModel)]="config.offsetY" data-testid="builder-offset-y" />
+          <span matTextSuffix>px</span>
+        </mat-form-field>
+      </div>
+      <mat-slide-toggle [(ngModel)]="config.overlapTrigger" data-testid="builder-overlap">
+        Overlap trigger <code>mdePopoverOverlapTrigger</code>
+      </mat-slide-toggle>
+      <p class="note">Overlap moves the panel onto the trigger's edge; it is most visible with start/center/end positions.</p>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>mdePopoverScrollStrategy</mat-label>
+        <mat-select [(ngModel)]="config.scrollStrategy">
+          <mat-option value="reposition">reposition</mat-option>
+          <mat-option value="close">close</mat-option>
+          <mat-option value="block">block</mat-option>
+          <mat-option value="noop">noop</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-            <section class="example-section">
-              <mat-checkbox class="example-margin" [(ngModel)]="thumbLabel"
-                >Show thumb label</mat-checkbox
-                >
-              </section>
+      <h3>Behavior</h3>
+      <mat-slide-toggle [(ngModel)]="config.closeOnClick" data-testid="builder-close-on-click">
+        Close on content click <code>mdePopoverCloseOnClick</code>
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="config.closeOnClickTrigger" [disabled]="!closeOnClickTriggerApplies" data-testid="builder-close-on-click-trigger">
+        Close on trigger click <code>mdePopoverCloseOnClickTrigger</code>
+      </mat-slide-toggle>
+      <p class="note" data-testid="builder-close-on-click-trigger-hint">{{ closeOnClickTriggerHint }}</p>
+      <mat-slide-toggle [(ngModel)]="config.backdropCloseOnClick" data-testid="builder-backdrop-close">
+        Close on outside click <code>mdePopoverBackdropCloseOnClick</code>
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="config.disableAnimation">
+        Disable animation <code>mdePopoverDisableAnimation</code>
+      </mat-slide-toggle>
 
-              <section class="example-section">
-                <mat-checkbox class="example-margin" [(ngModel)]="vertical"
-                  >Vertical</mat-checkbox
-                  >
-                  <mat-checkbox class="example-margin" [(ngModel)]="invert"
-                    >Inverted</mat-checkbox
-                    >
-                  </section>
+      <h3>Timing <small>(hover only)</small></h3>
+      <div class="row">
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverEnterDelay</mat-label>
+          <input matInput type="number" min="0" step="50" [(ngModel)]="config.enterDelay" [disabled]="config.triggerOn !== 'hover'" data-testid="builder-enter-delay" />
+          <span matTextSuffix>ms</span>
+        </mat-form-field>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverLeaveDelay</mat-label>
+          <input matInput type="number" min="0" step="50" [(ngModel)]="config.leaveDelay" [disabled]="config.triggerOn !== 'hover'" />
+          <span matTextSuffix>ms</span>
+        </mat-form-field>
+      </div>
 
-                  <section class="example-section">
-                    <mat-checkbox class="example-margin" [(ngModel)]="disabled"
-                      >Disabled</mat-checkbox
-                      >
-                    </section>
-                  </mat-card-content>
-                </mat-card>
+      <h3>Arrow</h3>
+      <p class="note" [class.warn]="!arrowVisible" data-testid="builder-arrow-hint">
+        {{ arrowVisible ? 'The arrow is visible for the current position.' : arrowHiddenReason }}
+      </p>
+      <div class="row">
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverArrowWidth</mat-label>
+          <input matInput type="number" min="0" [(ngModel)]="config.arrowWidth" [disabled]="!arrowVisible" data-testid="builder-arrow-width" />
+          <span matTextSuffix>px</span>
+        </mat-form-field>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverArrowColor</mat-label>
+          <input matInput [(ngModel)]="config.arrowColor" [disabled]="!arrowVisible" data-testid="builder-arrow-color" />
+          <input matTextSuffix class="swatch" type="color" aria-label="Pick arrow color" [disabled]="!arrowVisible" (input)="config.arrowColor = $any($event.target).value" />
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverArrowOffsetX</mat-label>
+          <input matInput type="number" [(ngModel)]="config.arrowOffsetX" [disabled]="!arrowVisible" />
+          <span matTextSuffix>px</span>
+        </mat-form-field>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>mdePopoverArrowOffsetY</mat-label>
+          <input matInput type="number" [(ngModel)]="config.arrowOffsetY" [disabled]="!arrowVisible" />
+          <span matTextSuffix>px</span>
+        </mat-form-field>
+      </div>
 
-                <mat-card class="result">
-                  <mat-card-content>
-                    <mat-card-title>
-                      <h2 class="example-h2">Result</h2>
+      <h3>Accessibility</h3>
+      <mat-slide-toggle [(ngModel)]="config.focusTrapEnabled">
+        Focus trap <code>mdeFocusTrapEnabled</code>
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="config.focusTrapAutoCaptureEnabled" [disabled]="!config.focusTrapEnabled">
+        Auto-capture focus <code>mdeFocusTrapAutoCaptureEnabled</code>
+      </mat-slide-toggle>
+    </mat-card-content>
+  </mat-card>
 
-                      <mat-button-toggle-group
-                        class="align-content"
-                        name="fontStyle"
-                        aria-label="Align Style"
-                        #group="matButtonToggleGroup"
-                        [(ngModel)]="alignButton"
-                        >
-                        <mat-button-toggle value="align-left" selected>Left</mat-button-toggle>
-                        <mat-button-toggle value="align-center">Center</mat-button-toggle>
-                        <mat-button-toggle value="align-right">Right</mat-button-toggle>
-                      </mat-button-toggle-group>
-                      <button (click)="resetForm()">RESET</button>
-                    </mat-card-title>
+  <div class="output">
+    <mat-card class="preview" appearance="outlined">
+      <mat-card-content>
+        <div class="preview-toolbar">
+          <h3>Preview</h3>
+          <mat-button-toggle-group [(ngModel)]="align" aria-label="Trigger alignment" hideSingleSelectionIndicator>
+            <mat-button-toggle value="start" data-testid="builder-align-start">Left</mat-button-toggle>
+            <mat-button-toggle value="center">Center</mat-button-toggle>
+            <mat-button-toggle value="end" data-testid="builder-align-end">Right</mat-button-toggle>
+          </mat-button-toggle-group>
+          <button mat-stroked-button (click)="reset()" data-testid="builder-reset">Reset</button>
+        </div>
+        <div class="stage" [class]="'stage align-' + align">
+          @for (k of [triggerKey]; track k) {
+            <button
+              mat-flat-button
+              data-testid="builder-trigger"
+              [mdePopoverTriggerFor]="playgroundPopover"
+              [mdePopoverCloseOnClickTrigger]="config.closeOnClickTrigger"
+              [mdePopoverBackdropCloseOnClick]="config.backdropCloseOnClick"
+              [mdeDisablePopoverTrigger]="config.disableTrigger"
+            >
+              {{ triggerLabel }}
+            </button>
+          }
+        </div>
+        @if (config.triggerOn === 'none') {
+          <div class="manual">
+            <button mat-button (click)="openPreview()" data-testid="builder-open">openPopover()</button>
+            <button mat-button (click)="closePreview()" data-testid="builder-close">closePopover()</button>
+          </div>
+        }
+        <p class="note" data-testid="builder-close-note">
+          The library closes on Escape only while focus is inside the panel. In this playground Escape
+          works anywhere, and the popover's own Close button always closes it.
+          @if (config.triggerOn === 'click') {
+            In click mode a transparent backdrop covers the page while the popover is open.
+          }
+        </p>
+      </mat-card-content>
+    </mat-card>
 
-                    <div class="">
-                      <button
-                        class="align-it"
-                        [ngClass]="alignButton"
-                        mat-raised-button
-                        color="primary"
-                        [mdePopoverTriggerFor]="popover0"
-                        #popoverTrigger="mdePopoverTrigger"
-                        >
-                        Hover Me
-                      </button>
-                    </div>
-                  </mat-card-content>
-                </mat-card>
+    <mat-card class="snippet" appearance="outlined">
+      <mat-card-content>
+        <div class="preview-toolbar">
+          <h3>Template</h3>
+          <span class="note">{{ changedInputs.length }} input(s) differ from the library defaults</span>
+          <button mat-button (click)="copySnippet()" data-testid="builder-copy">{{ copied ? 'Copied' : 'Copy' }}</button>
+        </div>
+        <pre data-testid="builder-snippet"><code>{{ snippet }}</code></pre>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
 
-                <mde-popover
-                  #popover0="mdePopover"
-                  [mdePopoverPositionX]="popoverPositionX"
-                  [mdePopoverPositionY]="popoverPositionY"
-                  [mdePopoverLeaveDelay]="1000"
-                  [mdePopoverTriggerOn]="event"
-                  >
-                  <mat-card class="example-card">
-                    <mat-card-content>
-                      <p>Click popover, I will close.</p>
-                    </mat-card-content>
-                    <mat-card-actions>
-                      <button mat-button>LIKE</button>
-                      <button mat-button>SHARE</button>
-                    </mat-card-actions>
-                  </mat-card>
-                </mde-popover>
+<mde-popover
+  #playgroundPopover="mdePopover"
+  [mdePopoverTriggerOn]="config.triggerOn"
+  [mdePopoverPositionX]="config.positionX"
+  [mdePopoverPositionY]="config.positionY"
+  [mdePopoverOverlapTrigger]="config.overlapTrigger"
+  [mdePopoverScrollStrategy]="config.scrollStrategy"
+  [mdePopoverCloseOnClick]="config.closeOnClick"
+  [mdePopoverDisableAnimation]="config.disableAnimation"
+  [mdePopoverEnterDelay]="config.enterDelay"
+  [mdePopoverLeaveDelay]="config.leaveDelay"
+  [mdePopoverOffsetX]="config.offsetX"
+  [mdePopoverOffsetY]="config.offsetY"
+  [mdePopoverArrowOffsetX]="config.arrowOffsetX"
+  [mdePopoverArrowOffsetY]="config.arrowOffsetY"
+  [mdePopoverArrowWidth]="config.arrowWidth"
+  [mdePopoverArrowColor]="config.arrowColor"
+  [mdeFocusTrapEnabled]="config.focusTrapEnabled"
+  [mdeFocusTrapAutoCaptureEnabled]="config.focusTrapAutoCaptureEnabled"
+>
+  <mat-card class="popover-card" appearance="outlined" data-testid="builder-popover-content">
+    <mat-card-content>
+      <strong>Hello from mde-popover</strong>
+      <p>{{ contentHint }}</p>
+      <button mat-stroked-button (click)="closePreview(); $event.stopPropagation()" data-testid="builder-popover-close">Close</button>
+    </mat-card-content>
+  </mat-card>
+</mde-popover>

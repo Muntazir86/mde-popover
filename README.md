@@ -4,7 +4,9 @@
 
 #### Links
 [Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) | 
-[Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md) | [npm](https://www.npmjs.com/package/@muntazir86/material-extended)
+[Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md) | [Changelog](libs/@muntazir/material-extended/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@muntazir86/material-extended)
+
+Commit messages and the manual release flow are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 
 
