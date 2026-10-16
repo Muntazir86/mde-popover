@@ -86,7 +86,10 @@
         "tsConfig": "apps/popper-test/tsconfig.spec.json",
         "runner": "vitest",
         "watch": false
-      }
+      },
+      "dependsOn": [
+        "^build"
+      ]
     },
     "lint": {
       "executor": "@nx/eslint:lint",
