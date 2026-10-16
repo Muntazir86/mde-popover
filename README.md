@@ -23,6 +23,7 @@ If you'd like to contribute please create an issue or pull request.
 
 | Angular Version | Package Compatibility |
 | --------------- | ---------------------- |
+| 22.x            | 11.x          |
 | 21.x            | 10.x          |
 | 20.x            | 9.x           |
 | 19.x            | 8.x           |

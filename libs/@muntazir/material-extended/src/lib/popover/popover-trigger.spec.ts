@@ -5,7 +5,7 @@ import {
   Overlay,
   OverlayRef,
 } from '@angular/cdk/overlay';
-import { ApplicationRef, ElementRef, Component } from '@angular/core';
+import { ApplicationRef, ElementRef, Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { EMPTY, Subject } from 'rxjs';
@@ -25,6 +25,7 @@ import {
 @Component({
   selector: 'mde-spec-trigger-host',
   imports: [MdePopover, MdePopoverTrigger, MdePopoverTarget],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <mde-popover
       #popover="mdePopover"
@@ -126,6 +127,7 @@ class TriggerHost {
 @Component({
   selector: 'mde-spec-missing-popover',
   imports: [MdePopoverTrigger],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `<button type="button" [mdePopoverTriggerFor]="popover">Open</button>`,
 })
 class MissingPopoverHost {
@@ -887,6 +889,8 @@ describe('MdePopoverTrigger', () => {
       });
 
       trigger.openPopover();
+      // CDK 22 re-applies the real position once the overlay settles; let it finish first.
+      await fixture.whenStable();
       strategyOf(trigger).positionChanges.next({
         connectionPair: new ConnectionPositionPair(
           { originX: 'center', originY: 'top' },
@@ -917,6 +921,8 @@ describe('MdePopoverTrigger', () => {
       });
 
       trigger.openPopover();
+      // CDK 22 re-applies the real position once the overlay settles; let it finish first.
+      await fixture.whenStable();
       strategyOf(trigger).positionChanges.next({
         connectionPair: new ConnectionPositionPair(
           { originX: 'end', originY: 'bottom' },
@@ -945,6 +951,8 @@ describe('MdePopoverTrigger', () => {
       });
 
       trigger.openPopover();
+      // CDK 22 re-applies the real position once the overlay settles; let it finish first.
+      await fixture.whenStable();
       const changes = strategyOf(trigger).positionChanges;
       const emit = (overlayY: 'bottom' | 'center') => {
         changes.next({
