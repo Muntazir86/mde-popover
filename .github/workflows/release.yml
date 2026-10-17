@@ -1,5 +1,5 @@
 # Manual npm release. Pull requests and pushes do not start this workflow.
-# Dispatch it from the branch you want to release (10.x, 11.x, ...) and type
+# It runs from master only (any other branch fails at the first step). Type
 # "publish" to confirm.
 #
 # The workflow never publishes directly. It tags the version, creates the GitHub
@@ -13,7 +13,7 @@
 #
 # mode:
 #   package-version  release exactly the version in the library package.json
-#                    (first release of a major, e.g. 10.0.0 on 10.x, 11.0.0 on 11.x).
+#                    (first release of a major, e.g. 10.0.0, later 11.0.0).
 #                    Also use it to retry a run whose staging step failed.
 #   patch / minor    bump within the current major
 #   conventional     let conventional commits choose the bump
@@ -50,6 +50,11 @@ jobs:
     if: github.event.inputs.confirm == 'publish'
     runs-on: ubuntu-latest
     steps:
+      - name: Only release from master
+        if: github.ref != 'refs/heads/master'
+        run: |
+          echo "::error::Run the Release workflow from master, not ${GITHUB_REF}."
+          exit 1
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
