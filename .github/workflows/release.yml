@@ -1,5 +1,15 @@
 # Manual npm release. Pull requests and pushes do not start this workflow.
-# Requires the NPM_TOKEN repository secret. Dispatch it only to publish.
+# Requires the NPM_TOKEN repository secret. Dispatch it from the branch you
+# want to release (10.x, 11.x, ...) and type "publish" to confirm.
+#
+# mode:
+#   package-version  publish exactly the version in the library package.json
+#                    (first release of a major, e.g. 10.0.0 on 10.x, 11.0.0 on 11.x)
+#   patch / minor    bump within the current major
+#   conventional     let conventional commits choose the bump
+# Every mode fails if the result would leave the major in package.json.
+# The newest major is published with the npm dist-tag "latest"; older majors
+# get "vN-lts" (v10-lts, ...).
 
 name: Release
 
@@ -7,9 +17,19 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: "Type publish to version, tag, and publish to npm"
+        description: "Type publish to tag, create the GitHub release, and publish to npm"
         required: true
         type: string
+      mode:
+        description: "Version source"
+        required: true
+        type: choice
+        default: package-version
+        options:
+          - package-version
+          - patch
+          - minor
+          - conventional
 
 permissions:
   contents: write
@@ -31,12 +51,44 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: Install dependencies
         run: npm ci
-      - name: Version, changelog, tag, and GitHub release
-        run: npx nx release --skip-publish
+      - name: Git identity for the release commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Resolve and guard the version
+        id: resolve
+        run: node tools/release/resolve-release.mjs --mode "${{ github.event.inputs.mode }}"
+      - name: Tag and GitHub release (package version)
+        if: github.event.inputs.mode == 'package-version'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+          GITHUB_LATEST: ${{ steps.resolve.outputs.github_latest }}
+        run: |
+          set -euo pipefail
+          node tools/release/resolve-release.mjs --notes "$VERSION" > "$RUNNER_TEMP/notes.md"
+          git tag -a "$TAG" -m "$TAG"
+          git push origin "refs/tags/$TAG"
+          gh release create "$TAG" --verify-tag --title "$TAG" \
+            --notes-file "$RUNNER_TEMP/notes.md" --latest="$GITHUB_LATEST"
+      - name: Version, changelog, tag, and GitHub release (bump)
+        if: github.event.inputs.mode != 'package-version'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SPECIFIER: ${{ steps.resolve.outputs.specifier }}
+        run: npx nx release $SPECIFIER --skip-publish --yes
+      - name: Check the version on disk
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: |
+          actual="$(node -p "require('./libs/@muntazir/material-extended/package.json').version")"
+          if [ "$actual" != "$VERSION" ]; then
+            echo "::error::package.json is $actual, expected $VERSION"
+            exit 1
+          fi
       - name: Publish to npm
-        run: npx nx release publish
+        run: npx nx release publish --tag "${{ steps.resolve.outputs.dist_tag }}"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -35,16 +35,26 @@ Git tags use `v{version}` (`releaseTag.pattern`). On `master`, Nx looks for the 
 
 Generated notes are prepended to `libs/@muntazir/material-extended/CHANGELOG.md`, above the hand-written history. Nx also opens a GitHub release for that tag. Nothing in pull-request or `master` CI publishes to npm.
 
-There is no `v10.0.0` tag yet. Tag that version on the commit that matches package version 10.0.0 before the first real release. Until that tag exists, a release treats every conventional commit since the first commit as unpublished work.
+Each major has its own branch (`10.x` for Angular 21, `11.x` for Angular 22). Release a major from its branch, not from `master`.
 
-Manual flow, from a clean checkout of the branch you want to release:
+Use the [Release workflow](.github/workflows/release.yml): Actions → Release → Run workflow, pick the branch, type `publish`, and choose a mode:
+
+| Mode | Version published |
+| --- | --- |
+| `package-version` | Exactly the version in `libs/@muntazir/material-extended/package.json`. Use it for the first release of a major (10.0.0 on `10.x`, 11.0.0 on `11.x`). It tags `v{version}`, creates the GitHub release from that version's `CHANGELOG.md` section, and publishes. |
+| `patch` / `minor` | The next patch or minor in the current major. Nx Release bumps both manifests, prepends the changelog, commits, tags, pushes, and creates the GitHub release. |
+| `conventional` | The bump chosen from conventional commits since the last `v*` tag on the branch. |
+
+`tools/release/resolve-release.mjs` guards every mode. The run fails if the version would leave the major in `package.json` (for example a `feat!` commit on `10.x`), if the `N.x` branch does not match that major, or if the tag or npm version already exists. A new major needs a new `N.x` branch, a manual `package.json` bump, and a `package-version` release.
+
+The newest major is published with the npm dist-tag `latest`. Older majors get `v{major}-lts` (for example `v10-lts`), like the existing `v5-lts` and `v6-lts`. The GitHub release is only marked latest for the newest major. The workflow needs an `NPM_TOKEN` repository secret. Pull requests and pushes do not start it.
+
+To preview locally, from a clean checkout of the branch:
 
 ```
-npx nx release --dry-run
-npx nx release --skip-publish
-npx nx release publish
+node tools/release/resolve-release.mjs --mode package-version
+npx nx release patch --skip-publish --dry-run
+npx nx release publish --dry-run --tag latest
 ```
 
-`--dry-run` prints the next version, changelog, tag, and GitHub release and writes nothing. `nx release --skip-publish` bumps both package manifests, prepends the changelog, commits, tags, pushes, and creates the GitHub release. It does not publish to npm. `nx release publish` builds the library and publishes `dist/@muntazir/material-extended` with public access. Log in with npm first, or set `NODE_AUTH_TOKEN`.
-
-An optional [Release workflow](.github/workflows/release.yml) does the same two commands when someone runs it with Actions → Run workflow and types `publish`. It needs an `NPM_TOKEN` repository secret. Pull requests and pushes do not start it.
+`--dry-run` writes nothing. Do not run `nx release` without a specifier before the major has a `v{version}` tag. Without a tag, Nx counts every commit since the first one and can choose the next major.
