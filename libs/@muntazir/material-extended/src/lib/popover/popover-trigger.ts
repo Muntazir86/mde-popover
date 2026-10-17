@@ -550,7 +550,7 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   /**
    * This method builds the position strategy for the overlay, so the popover is properly connected
    * to the trigger.
-   * @returns ConnectedPositionStrategy
+   * @returns FlexibleConnectedPositionStrategy
    */
   private _getPositionStrategy(): FlexibleConnectedPositionStrategy {
     let posx = this.popover.positionX;
