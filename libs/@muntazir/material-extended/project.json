@@ -8,6 +8,7 @@
   "targets": {
     "build": {
       "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/@muntazir/material-extended"],
       "options": {
         "project": "libs/@muntazir/material-extended/ng-package.json",
         "tsConfig": "libs/@muntazir/material-extended/tsconfig.lib.json"

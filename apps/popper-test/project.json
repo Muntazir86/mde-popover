@@ -114,5 +114,6 @@
         "email": "ghulamshabbirmtn500@gmail.com"
       }
     }
-  }
+  },
+  "implicitDependencies": ["@muntazir/material-extended"]
 }
