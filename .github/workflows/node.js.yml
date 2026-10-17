@@ -1,42 +1,45 @@
-# Installs dependencies and builds the library and demo on pull requests and on
-# pushes to master and the 11.x/10.x maintenance branches. Publishes the demo to the gh-pages branch only when commits
-# land on master.
+# CI for every branch: lint, library and demo unit tests, builds, and e2e.
+#
+# It runs on pushes to any branch and on pull requests into any branch. A pull
+# request from a branch in this repository is already tested by the push run
+# for the same commit, so its pull_request run skips the jobs; pull requests
+# from forks run them. The Node.js version comes from .nvmrc, so this file is
+# identical on master and the maintenance branches (10.x, 11.x, ...).
+#
+# Deploying the demo to gh-pages is in deploy.yml (master only).
 
 name: Node.js CI
 
 on:
   push:
-    branches: ["master", "11.x", "10.x"]
+    branches: ["**"]
   pull_request:
-    branches: ["master", "11.x", "10.x"]
 
 permissions:
   contents: read
-  actions: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
   build:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [22.23.3]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v5
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: .nvmrc
           cache: npm
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Lint
         run: npm run lint
-      - name: Unit tests
+      - name: Library unit tests
         run: npm test
       - name: Demo unit tests
         run: npm run test:demo
@@ -44,71 +47,23 @@ jobs:
         run: npm run build:prod
       - name: Build demo
         run: npm run build:demo
-
-  deploy:
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: write
-
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          persist-credentials: true
-      - name: Use Node.js 22.23.3
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22.23.3
-          cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Build library
-        run: npm run build:prod
-      - name: Deploy to gh-pages
-        run: |
-          set -euo pipefail
-          if [[ $- == *x* ]]; then
-            echo "Refusing to deploy with shell tracing enabled."
-            exit 1
-          fi
-          # actions/checkout stored an Authorization header for GITHUB_TOKEN.
-          # angular-cli-ghpages copies GH_TOKEN or GITHUB_TOKEN into the clone
-          # URL and logs that URL, so hide those variables and authenticate with
-          # the header instead.
-          header="$(git config --local --get http.https://github.com/.extraheader)"
-          printf '::add-mask::%s\n' "${header}"
-          env \
-            -u GH_TOKEN \
-            -u GITHUB_TOKEN \
-            -u PERSONAL_TOKEN \
-            GIT_TERMINAL_PROMPT=0 \
-            GIT_CONFIG_COUNT=1 \
-            GIT_CONFIG_KEY_0=http.https://github.com/.extraheader \
-            GIT_CONFIG_VALUE_0="${header}" \
-            npm run deploy
+      - name: Build library with ng-packagr
+        run: npm run build:pack
 
   e2e:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [22.23.3]
-
     steps:
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v5
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: .nvmrc
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
       - name: End-to-end tests
         run: npm run e2e
       - name: Upload Playwright report
