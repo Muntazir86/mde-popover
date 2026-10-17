@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-// Resolves and guards the version the Release workflow publishes.
+// Resolves and guards the version the Release workflow stages.
 //
 //   node tools/release/resolve-release.mjs --mode <package-version|patch|minor|conventional>
 //   node tools/release/resolve-release.mjs --notes <version>   (prints that CHANGELOG section)
 //
-// package-version releases exactly the version in the library package.json (first release of a
-// major). The other modes let Nx Release bump, but the result must stay in the current major, so a
-// breaking-change commit can never push master to the next major.
+// Releases can run from any branch: master for its current major, and maintenance branches such
+// as 10.x for older majors. package-version releases exactly the version in the library
+// package.json (first release of a major). The other modes let Nx Release bump, but the result
+// must stay in the branch's package.json major, so a breaking-change commit can never move a
+// branch to the next major. A branch named N.x may only release major N.
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
 
@@ -53,15 +55,12 @@ if (!MODES.includes(mode)) fail(`Unknown mode "${mode}". Use one of: ${MODES.joi
 const current = pkg.version;
 const currentMajor = majorOf(current);
 
-// Releases run from master only. In GitHub Actions any other branch fails; a local preview on
-// another branch only warns.
+// Any branch may release, but a maintenance branch named N.x may only release major N.
 const branch =
   process.env.GITHUB_REF_NAME || tryRun('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
-if (branch !== 'master') {
-  if (process.env.GITHUB_ACTIONS === 'true') {
-    fail(`Releases run from master only, not from ${branch}.`);
-  }
-  console.error(`warning: previewing on ${branch}; the Release workflow only runs on master.`);
+const branchMajor = /^(\d+)\.x$/.exec(branch);
+if (branchMajor && Number(branchMajor[1]) !== currentMajor) {
+  fail(`Branch ${branch} is for major ${branchMajor[1]}, but package.json is ${current}.`);
 }
 
 let version = current;
@@ -79,7 +78,7 @@ if (mode !== 'package-version') {
 if (majorOf(version) !== currentMajor) {
   fail(
     `Refusing to release ${version}: it leaves major ${currentMajor} (package.json is ${current}). ` +
-      `A new major needs a manual package.json bump on master, then a package-version release.`
+      `A new major needs a manual package.json bump (on master or a new N.x branch), then a package-version release.`
   );
 }
 
@@ -102,9 +101,27 @@ if (tryRun('npm', ['view', `${pkg.name}@${version}`, 'version'])) {
   fail(`${pkg.name}@${version} is already on npm.`);
 }
 
-// The newest major gets "latest"; older majors get a vN-lts dist-tag, like v5-lts and v6-lts.
-const latest = tryRun('npm', ['view', pkg.name, 'dist-tags.latest']);
-const distTag = !latest || currentMajor >= majorOf(latest) ? 'latest' : `v${currentMajor}-lts`;
+// Dist-tag: the highest major on npm (or a new, higher one) gets "latest"; older majors get a
+// vN-lts dist-tag, like v5-lts and v6-lts. Prereleases are ignored when finding the highest major.
+// A registry error fails the run instead of silently choosing "latest"; only a missing package
+// (first ever release) counts as no versions.
+const published = (() => {
+  let out;
+  try {
+    out = run('npm', ['view', pkg.name, 'versions', '--json']);
+  } catch (err) {
+    if (/E404/.test(`${err.stdout ?? ''}${err.stderr ?? ''}`)) return [];
+    fail(`Could not read the published versions of ${pkg.name} from npm.`);
+  }
+  const parsed = JSON.parse(out);
+  return Array.isArray(parsed) ? parsed : [parsed];
+})();
+const stable = published.filter((v) => /^\d+\.\d+\.\d+$/.test(v));
+const highestMajor = stable.length ? Math.max(...stable.map(majorOf)) : 0;
+const isNewest = currentMajor >= highestMajor;
+const distTag = isNewest ? 'latest' : `v${currentMajor}-lts`;
+// When an older major is released, keep the GitHub "latest" badge on the npm latest version.
+const npmLatest = tryRun('npm', ['view', pkg.name, 'dist-tags.latest']);
 
 const result = {
   package: pkg.name,
@@ -115,8 +132,10 @@ const result = {
   tag,
   specifier,
   dist_tag: distTag,
+  highest_major: String(highestMajor),
   tag_exists: String(tagExists),
-  github_latest: String(distTag === 'latest'),
+  github_latest: String(isNewest),
+  github_latest_tag: isNewest ? tag : npmLatest ? `v${npmLatest}` : '',
 };
 for (const [k, v] of Object.entries(result)) console.log(`${k}=${v}`);
 if (process.env.GITHUB_OUTPUT) {

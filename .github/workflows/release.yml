@@ -1,6 +1,7 @@
 # Manual npm release. Pull requests and pushes do not start this workflow.
-# It runs from master only (any other branch fails at the first step). Type
-# "publish" to confirm.
+# Run it from the branch that owns the major: master for the current major, or a
+# maintenance branch (10.x, 11.x, ...) for its own major. Type "publish" to
+# confirm. The file is identical on every branch; Node.js comes from .nvmrc.
 #
 # The workflow never publishes directly. It tags the version, creates the GitHub
 # release, and stages the package with `npm stage publish`. A maintainer then
@@ -13,13 +14,15 @@
 #
 # mode:
 #   package-version  release exactly the version in the library package.json
-#                    (first release of a major, e.g. 10.0.0, later 11.0.0).
+#                    (first release of a major, e.g. 11.0.0 from 11.x).
 #                    Also use it to retry a run whose staging step failed.
-#   patch / minor    bump within the current major
+#   patch / minor    bump within the branch's current major
 #   conventional     let conventional commits choose the bump
-# Every mode fails if the result would leave the major in package.json.
-# The newest major is staged with the npm dist-tag "latest"; older majors get
-# "vN-lts" (v10-lts, ...). The dist-tag is fixed at stage time.
+# Every mode fails if the result would leave the major in package.json, and a
+# branch named N.x may only release major N (tools/release/resolve-release.mjs).
+# The highest major on npm (or a new, higher one) is staged with the dist-tag
+# "latest"; older majors get "vN-lts" (v10-lts, ...). The dist-tag is fixed at
+# stage time.
 
 name: Release
 
@@ -50,19 +53,14 @@ jobs:
     if: github.event.inputs.confirm == 'publish'
     runs-on: ubuntu-latest
     steps:
-      - name: Only release from master
-        if: github.ref != 'refs/heads/master'
-        run: |
-          echo "::error::Run the Release workflow from master, not ${GITHUB_REF}."
-          exit 1
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           persist-credentials: true
-      - name: Use Node.js 22.14.0
+      - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v5
         with:
-          node-version: 22.14.0
+          node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org
           package-manager-cache: false # no dependency cache in release builds
       - name: Install dependencies
@@ -104,6 +102,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SPECIFIER: ${{ steps.resolve.outputs.specifier }}
         run: npx nx release $SPECIFIER --skip-publish --yes
+      - name: Keep the GitHub latest release on the newest major (bump)
+        # Nx marks the release it creates as latest; for an older major, move the
+        # badge back to the release of the npm "latest" version.
+        if: github.event.inputs.mode != 'package-version' && steps.resolve.outputs.github_latest != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LATEST_TAG: ${{ steps.resolve.outputs.github_latest_tag }}
+        run: |
+          set -euo pipefail
+          if [ -n "$LATEST_TAG" ] && gh release view "$LATEST_TAG" >/dev/null 2>&1; then
+            gh release edit "$LATEST_TAG" --latest
+          else
+            echo "::warning::No GitHub release for ${LATEST_TAG:-the npm latest version}; check which release is marked latest."
+          fi
       - name: Check the version on disk
         env:
           VERSION: ${{ steps.resolve.outputs.version }}

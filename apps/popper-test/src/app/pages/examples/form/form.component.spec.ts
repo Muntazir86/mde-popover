@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PageExamplesFormComponent } from './form.component';
 
@@ -6,11 +6,11 @@ describe('PageExamplesFormComponent', () => {
   let component: PageExamplesFormComponent;
   let fixture: ComponentFixture<PageExamplesFormComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
     imports: [PageExamplesFormComponent],
 }).compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PageExamplesFormComponent);
