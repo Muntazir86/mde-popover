@@ -14,6 +14,7 @@
     "deploy": "nx run popper-test:deploy --base-href=/mde-popover/",
     "watch": "nx build --watch --configuration development",
     "test": "nx test @muntazir/material-extended --coverage",
+    "test:demo": "nx test popper-test",
     "commitlint": "commitlint --from HEAD~1 --to HEAD"
   },
   "private": true,
