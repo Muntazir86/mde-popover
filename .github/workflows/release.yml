@@ -1,15 +1,25 @@
 # Manual npm release. Pull requests and pushes do not start this workflow.
-# Requires the NPM_TOKEN repository secret. Dispatch it from the branch you
-# want to release (10.x, 11.x, ...) and type "publish" to confirm.
+# Dispatch it from the branch you want to release (10.x, 11.x, ...) and type
+# "publish" to confirm.
+#
+# The workflow never publishes directly. It tags the version, creates the GitHub
+# release, and stages the package with `npm stage publish`. A maintainer then
+# reviews and approves the staged version with 2FA on npmjs.com (Staged Packages
+# tab) or with `npm stage approve`. See CONTRIBUTING.md.
+#
+# Authentication: trusted publishing (OIDC) configured as stage-only on npmjs.com
+# for this workflow file. An optional NPM_TOKEN secret (granular token with
+# "Read and write (stage only)") is used only when OIDC is not configured.
 #
 # mode:
-#   package-version  publish exactly the version in the library package.json
-#                    (first release of a major, e.g. 10.0.0 on 10.x, 11.0.0 on 11.x)
+#   package-version  release exactly the version in the library package.json
+#                    (first release of a major, e.g. 10.0.0 on 10.x, 11.0.0 on 11.x).
+#                    Also use it to retry a run whose staging step failed.
 #   patch / minor    bump within the current major
 #   conventional     let conventional commits choose the bump
 # Every mode fails if the result would leave the major in package.json.
-# The newest major is published with the npm dist-tag "latest"; older majors
-# get "vN-lts" (v10-lts, ...).
+# The newest major is staged with the npm dist-tag "latest"; older majors get
+# "vN-lts" (v10-lts, ...). The dist-tag is fixed at stage time.
 
 name: Release
 
@@ -17,7 +27,7 @@ on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: "Type publish to tag, create the GitHub release, and publish to npm"
+        description: "Type publish to tag, create the GitHub release, and stage on npm"
         required: true
         type: string
       mode:
@@ -32,7 +42,8 @@ on:
           - conventional
 
 permissions:
-  contents: write
+  contents: write # release commit, tag, and GitHub release
+  id-token: write # npm trusted publishing (OIDC) and provenance
 
 jobs:
   release:
@@ -47,10 +58,15 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 22.14.0
-          cache: npm
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false # no dependency cache in release builds
       - name: Install dependencies
         run: npm ci
+      - name: Use npm 11.15+ (required for npm stage)
+        # After npm ci, so dependencies install exactly as in CI.
+        run: |
+          npm install -g npm@^11.21.1
+          npm --version
       - name: Git identity for the release commit and tag
         run: |
           git config user.name "github-actions[bot]"
@@ -64,14 +80,19 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.resolve.outputs.version }}
           TAG: ${{ steps.resolve.outputs.tag }}
+          TAG_EXISTS: ${{ steps.resolve.outputs.tag_exists }}
           GITHUB_LATEST: ${{ steps.resolve.outputs.github_latest }}
         run: |
           set -euo pipefail
-          node tools/release/resolve-release.mjs --notes "$VERSION" > "$RUNNER_TEMP/notes.md"
-          git tag -a "$TAG" -m "$TAG"
-          git push origin "refs/tags/$TAG"
-          gh release create "$TAG" --verify-tag --title "$TAG" \
-            --notes-file "$RUNNER_TEMP/notes.md" --latest="$GITHUB_LATEST"
+          if [ "$TAG_EXISTS" != "true" ]; then
+            git tag -a "$TAG" -m "$TAG"
+            git push origin "refs/tags/$TAG"
+          fi
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            node tools/release/resolve-release.mjs --notes "$VERSION" > "$RUNNER_TEMP/notes.md"
+            gh release create "$TAG" --verify-tag --title "$TAG" \
+              --notes-file "$RUNNER_TEMP/notes.md" --latest="$GITHUB_LATEST"
+          fi
       - name: Version, changelog, tag, and GitHub release (bump)
         if: github.event.inputs.mode != 'package-version'
         env:
@@ -87,8 +108,25 @@ jobs:
             echo "::error::package.json is $actual, expected $VERSION"
             exit 1
           fi
-      - name: Publish to npm
-        run: npx nx release publish --tag "${{ steps.resolve.outputs.dist_tag }}"
+      - name: Build the library
+        run: npx nx build @muntazir/material-extended --configuration production --skip-nx-cache
+      - name: Stage on npm (approve on npmjs.com with 2FA)
+        working-directory: dist/@muntazir/material-extended
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+          DIST_TAG: ${{ steps.resolve.outputs.dist_tag }}
+        run: |
+          set -euo pipefail
+          actual="$(node -p "require('./package.json').version")"
+          if [ "$actual" != "$VERSION" ]; then
+            echo "::error::dist package.json is $actual, expected $VERSION"
+            exit 1
+          fi
+          npm stage publish --tag "$DIST_TAG" --access public --provenance
+          {
+            echo "### Staged ${{ steps.resolve.outputs.package }}@$VERSION (dist-tag: $DIST_TAG)"
+            echo ""
+            echo "Review and approve it with 2FA in the Staged Packages tab on npmjs.com,"
+            echo "or run: npm stage list ${{ steps.resolve.outputs.package }} then npm stage approve <stage-id>"
+          } >> "$GITHUB_STEP_SUMMARY"
