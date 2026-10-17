@@ -4,7 +4,7 @@
 //   node tools/release/resolve-release.mjs --mode <package-version|patch|minor|conventional>
 //   node tools/release/resolve-release.mjs --notes <version>   (prints that CHANGELOG section)
 //
-// package-version publishes exactly the version in the library package.json (first release of a
+// package-version releases exactly the version in the library package.json (first release of a
 // major). The other modes let Nx Release bump, but the result must stay in the current major, so a
 // breaking-change commit can never push a maintenance branch to the next major.
 import { execFileSync } from 'node:child_process';
@@ -81,8 +81,19 @@ if (majorOf(version) !== currentMajor) {
 }
 
 const tag = `v${version}`;
-if (tryRun('git', ['ls-remote', '--tags', 'origin', `refs/tags/${tag}`])) {
-  fail(`Tag ${tag} already exists on origin.`);
+// An existing tag is only accepted when it points at the commit being released and the
+// version is not on npm yet. That lets a run whose staging step failed be retried with
+// mode package-version instead of leaving a tag with nothing behind it.
+let tagExists = false;
+const remoteTag = tryRun('git', ['ls-remote', '--tags', 'origin', `refs/tags/${tag}^{}`, `refs/tags/${tag}`]);
+if (remoteTag) {
+  const head = tryRun('git', ['rev-parse', 'HEAD']);
+  const lines = remoteTag.split('\n');
+  const peeled = (lines.find((l) => l.endsWith('^{}')) ?? lines[0]).split(/\s+/)[0];
+  if (mode !== 'package-version' || peeled !== head) {
+    fail(`Tag ${tag} already exists on origin at ${peeled.slice(0, 7)}, not at HEAD.`);
+  }
+  tagExists = true;
 }
 if (tryRun('npm', ['view', `${pkg.name}@${version}`, 'version'])) {
   fail(`${pkg.name}@${version} is already on npm.`);
@@ -101,6 +112,7 @@ const result = {
   tag,
   specifier,
   dist_tag: distTag,
+  tag_exists: String(tagExists),
   github_latest: String(distTag === 'latest'),
 };
 for (const [k, v] of Object.entries(result)) console.log(`${k}=${v}`);
