@@ -1,14 +1,14 @@
 # Installs dependencies and builds the library and demo on pull requests and on
-# pushes to master. Publishes the demo to the gh-pages branch only when commits
+# pushes to master and the 10.x/11.x maintenance branches. Publishes the demo to the gh-pages branch only when commits
 # land on master.
 
 name: Node.js CI
 
 on:
   push:
-    branches: ["master"]
+    branches: ["master", "10.x", "11.x"]
   pull_request:
-    branches: ["master"]
+    branches: ["master", "10.x", "11.x"]
 
 permissions:
   contents: read
