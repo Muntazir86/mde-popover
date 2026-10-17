@@ -125,6 +125,30 @@ class TriggerHost {
 }
 
 @Component({
+  selector: 'mde-spec-shared-popover-host',
+  imports: [MdePopover, MdePopoverTrigger],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  template: `
+    <mde-popover
+      #popover="mdePopover"
+      mdePopoverTriggerOn="click"
+      mdePopoverPositionX="center"
+      mdePopoverPositionY="below"
+      [mdePopoverOverlapTrigger]="false"
+    >
+      <span>Shared</span>
+    </mde-popover>
+    <button type="button" class="first" [mdePopoverTriggerFor]="popover">First</button>
+    @if (showSecond) {
+      <button type="button" class="second" [mdePopoverTriggerFor]="popover">Second</button>
+    }
+  `,
+})
+class SharedPopoverHost {
+  showSecond = true;
+}
+
+@Component({
   selector: 'mde-spec-missing-popover',
   imports: [MdePopoverTrigger],
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -1128,6 +1152,112 @@ describe('MdePopoverTrigger', () => {
       }
       expect(popover.positionX).toBe('before');
       expect(popover.positionY).toBe('above');
+    });
+  });
+
+  describe('a popover shared by several triggers', () => {
+    const below = (strategy: StrategyProbe) =>
+      `${strategy.positions[0].originY}/${strategy.positions[0].overlayY}`;
+
+    function reportPosition(strategy: StrategyProbe): void {
+      // What the CDK reports when the requested (non-fallback) position fits.
+      strategy.positionChanges.next({
+        connectionPair: strategy.positions[0],
+        scrollableViewProperties: {
+          isOriginClipped: false,
+          isOriginOutsideView: false,
+          isOverlayClipped: false,
+          isOverlayOutsideView: false,
+        },
+      });
+    }
+
+    async function setupShared() {
+      await TestBed.configureTestingModule({ imports: [SharedPopoverHost] }).compileComponents();
+      const shared = TestBed.createComponent(SharedPopoverHost);
+      shared.detectChanges();
+      const triggerAt = (selector: string) =>
+        shared.debugElement.query(By.css(selector)).injector.get(MdePopoverTrigger);
+      return { shared, triggerAt };
+    }
+
+    function strategyFor(trigger: MdePopoverTrigger): StrategyProbe {
+      return probe(trigger)._overlayRef?.getConfig()
+        .positionStrategy as unknown as StrategyProbe;
+    }
+
+    it('builds every new overlay from the requested position, not the last rendered one', async () => {
+      const { shared, triggerAt } = await setupShared();
+      const first = triggerAt('button.first');
+      const second = triggerAt('button.second');
+
+      first.openPopover();
+      await shared.whenStable();
+      reportPosition(strategyFor(first));
+      first.closePopover();
+
+      second.openPopover();
+      await shared.whenStable();
+
+      // center/below without overlap opens below the trigger: origin bottom, overlay top.
+      expect(below(strategyFor(first))).toBe('bottom/top');
+      expect(below(strategyFor(second))).toBe('bottom/top');
+      second.closePopover();
+      shared.destroy();
+    });
+
+    it('keeps the requested position for a trigger that is re-created', async () => {
+      const { shared, triggerAt } = await setupShared();
+      for (let round = 0; round < 3; round++) {
+        const second = triggerAt('button.second');
+        second.openPopover();
+        await shared.whenStable();
+        reportPosition(strategyFor(second));
+        expect(below(strategyFor(second))).toBe('bottom/top');
+        second.closePopover();
+
+        shared.componentInstance.showSecond = false;
+        shared.detectChanges();
+        shared.componentInstance.showSecond = true;
+        shared.detectChanges();
+      }
+      shared.destroy();
+    });
+
+    it('falls back to positionX/positionY for a panel without the requested-position members', async () => {
+      const { shared, triggerAt } = await setupShared();
+      const first = triggerAt('button.first');
+      const popover = shared.debugElement.query(By.directive(MdePopover))
+        .componentInstance as MdePopover;
+      // A custom MdePopoverPanel may not implement the optional members.
+      Object.defineProperty(popover, '_requestedPosition', { value: undefined });
+      Object.defineProperty(popover, '_setRenderedPosition', { value: undefined });
+
+      first.openPopover();
+      await shared.whenStable();
+      expect(below(strategyFor(first))).toBe('bottom/top');
+      reportPosition(strategyFor(first));
+      expect(popover.positionY).toBe('above');
+      expect(popover._classList['mde-popover-above']).toBe(true);
+      first.closePopover();
+      shared.destroy();
+    });
+
+    it('still reports the rendered position on the popover', async () => {
+      const { shared, triggerAt } = await setupShared();
+      const first = triggerAt('button.first');
+      const popover = shared.debugElement.query(By.directive(MdePopover))
+        .componentInstance as MdePopover;
+
+      first.openPopover();
+      await shared.whenStable();
+      reportPosition(strategyFor(first));
+
+      // The arrow styles and classes follow the rendered position (flipped for non-overlap).
+      expect(popover.positionY).toBe('above');
+      expect(popover._classList['mde-popover-above']).toBe(true);
+      first.closePopover();
+      shared.destroy();
     });
   });
 });

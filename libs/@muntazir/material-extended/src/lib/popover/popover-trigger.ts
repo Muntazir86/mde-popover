@@ -537,11 +537,17 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
 
         this.popover.zone.run(() => {
-          this.popover.positionX = posisionX;
-          this.popover.positionY = posisionY;
-          this.popover.setCurrentStyles();
-
-          this.popover.setPositionClasses(posisionX, posisionY);
+          // Record the rendered position without overwriting the requested one. Writing it to
+          // positionX/positionY made the next overlay built for this popover (another trigger
+          // sharing it, or a re-created trigger) start from the flipped position.
+          if (this.popover._setRenderedPosition) {
+            this.popover._setRenderedPosition(posisionX, posisionY);
+          } else {
+            this.popover.positionX = posisionX;
+            this.popover.positionY = posisionY;
+            this.popover.setCurrentStyles();
+            this.popover.setPositionClasses(posisionX, posisionY);
+          }
         });
       }
     );
@@ -553,8 +559,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
    * @returns FlexibleConnectedPositionStrategy
    */
   private _getPositionStrategy(): FlexibleConnectedPositionStrategy {
-    let posx = this.popover.positionX;
-    let posy = this.popover.positionY;
+    const requested = this.popover._requestedPosition;
+    let posx = requested ? requested.x : this.popover.positionX;
+    let posy = requested ? requested.y : this.popover.positionY;
 
     /** Reverse overlayY and fallbackOverlayY when overlapTrigger is false */
     if (!this.popover.overlapTrigger) {

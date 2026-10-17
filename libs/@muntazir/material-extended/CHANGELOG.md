@@ -22,6 +22,10 @@ Angular 22 support. The workspace moves to Nx 23.3, Angular and Angular Material
 - The demo app builds with `@angular/build` instead of the deprecated webpack-based `@angular-devkit/build-angular`. Karma and Jasmine are removed in favour of Vitest.
 - Demo components that hold mutable state opt into `ChangeDetectionStrategy.Eager` because Angular 22 makes `OnPush` the default.
 
+### Fixed
+
+- A popover without `mdePopoverOverlapTrigger` no longer flips to the other side of the trigger every time a new overlay is built for it, for example when several triggers share the popover or a trigger is re-created inside `@if`/`@for`. The rendered (fallback) position was written back over the requested `mdePopoverPositionX`/`mdePopoverPositionY`, so the next overlay started from the flipped position. With `mdePopoverOffsetY` the panel then also landed on top of the trigger.
+
 ## [10.0.0] - 2026-10-15
 
 Angular 21 support landed in [PR #13](https://github.com/Muntazir86/mde-popover/pull/13). The workspace uses Nx 22.5.4. Node.js 22.14 or later is required. Peer dependencies on `@angular/cdk`, `@angular/common`, and `@angular/core` are `^21.0.0`.
