@@ -203,6 +203,17 @@ test.describe('builder playground', () => {
     await expect(page.getByTestId('builder-close-note')).toContainText('only while focus is inside the panel');
   });
 
+  test('the floating support button stays clickable above the playground', async ({ page }) => {
+    await page.setViewportSize({ width: 1400, height: 900 });
+    await openDemo(page, 'examples/builder');
+    const fab = page.getByTestId('nav-support-trigger');
+    // The template card used to cover the fixed button at this size.
+    await fab.click({ timeout: 5000 });
+    await expect(page.getByTestId('support-chat')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('support-chat')).toHaveCount(0);
+  });
+
   test('the home page links to the builder', async ({ page }) => {
     await openDemo(page);
     await page.getByTestId('home-builder-link').click();
