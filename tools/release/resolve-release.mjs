@@ -6,7 +6,7 @@
 //
 // package-version releases exactly the version in the library package.json (first release of a
 // major). The other modes let Nx Release bump, but the result must stay in the current major, so a
-// breaking-change commit can never push a maintenance branch to the next major.
+// breaking-change commit can never push master to the next major.
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
 
@@ -53,12 +53,15 @@ if (!MODES.includes(mode)) fail(`Unknown mode "${mode}". Use one of: ${MODES.joi
 const current = pkg.version;
 const currentMajor = majorOf(current);
 
-// A maintenance branch N.x may only release major N.
+// Releases run from master only. In GitHub Actions any other branch fails; a local preview on
+// another branch only warns.
 const branch =
   process.env.GITHUB_REF_NAME || tryRun('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
-const branchMajor = /^(\d+)\.x$/.exec(branch)?.[1];
-if (branchMajor && Number(branchMajor) !== currentMajor) {
-  fail(`Branch ${branch} is for major ${branchMajor}, but package.json is ${current}.`);
+if (branch !== 'master') {
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    fail(`Releases run from master only, not from ${branch}.`);
+  }
+  console.error(`warning: previewing on ${branch}; the Release workflow only runs on master.`);
 }
 
 let version = current;
@@ -76,7 +79,7 @@ if (mode !== 'package-version') {
 if (majorOf(version) !== currentMajor) {
   fail(
     `Refusing to release ${version}: it leaves major ${currentMajor} (package.json is ${current}). ` +
-      `A new major needs its own N.x branch and a package.json bump, then a package-version release.`
+      `A new major needs a manual package.json bump on master, then a package-version release.`
   );
 }
 
