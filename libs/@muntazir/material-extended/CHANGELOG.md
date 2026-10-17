@@ -25,6 +25,9 @@ Angular 22 support. The workspace moves to Nx 23.3, Angular and Angular Material
 ### Fixed
 
 - A popover without `mdePopoverOverlapTrigger` no longer flips to the other side of the trigger every time a new overlay is built for it, for example when several triggers share the popover or a trigger is re-created inside `@if`/`@for`. The rendered (fallback) position was written back over the requested `mdePopoverPositionX`/`mdePopoverPositionY`, so the next overlay started from the flipped position. With `mdePopoverOffsetY` the panel then also landed on top of the trigger.
+- When the panel falls back to the other side of the trigger (no room on the requested side), `mdePopoverOffsetY`/`mdePopoverOffsetX` are mirrored for that fallback, so a gap stays a gap instead of pushing the flipped panel over the trigger.
+- Each time a popover opens, its arrow styles and position classes start from the side the trigger asks for. They used to keep the side where the popover last rendered (for another trigger sharing it, or after a flip). Without overlap the arrow changes the panel height, and the overlay measures the panel before it reports a position. So a panel could flip with room to spare, or overflow the viewport by the arrow size.
+- A popover opened by hover no longer moves focus onto its trigger when it closes. Only a keyboard open restores focus. With several triggers sharing one popover, moving the pointer to the next trigger used to focus the previous one.
 
 ## [10.0.0] - 2026-10-15
 

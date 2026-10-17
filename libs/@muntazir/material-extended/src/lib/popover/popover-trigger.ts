@@ -16,6 +16,7 @@ import {
 import { isFakeMousedownFromScreenReader } from '@angular/cdk/a11y';
 import { Direction, Directionality } from '@angular/cdk/bidi';
 import {
+  ConnectionPositionPair,
   Overlay,
   OverlayRef,
   OverlayConfig,
@@ -55,6 +56,8 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
 
   private _portal: TemplatePortal<void>;
   private _overlayRef: OverlayRef | null = null;
+  /** The preferred connection pair of this trigger's overlay. */
+  private _targetPosition: ConnectionPositionPair | null = null;
   private _popoverOpen = false;
   private _halt = false;
   private _backdropSubscription: Subscription | null = null;
@@ -245,6 +248,11 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
       this._clearTimer('_mouseoverTimer');
       this._mouseoverTimer = setTimeout(() => {
         this._mouseoverTimer = null;
+        // A hover open is a pointer open: closing it must not move focus onto this trigger
+        // (with a shared popover that refocused the row the pointer had already left).
+        if (!this._popoverOpen) {
+          this._openedByMouse = true;
+        }
         this.openPopover();
       }, this.popover.enterDelay);
     }
@@ -276,7 +284,15 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   /** Opens the popover. */
   openPopover(): void {
     if (!this._popoverOpen && !this._halt && !this.disablePopoverTrigger) {
-      this._createOverlay().attach(this._portal);
+      const overlayRef = this._createOverlay();
+      // The popover may have last rendered on another side (for another trigger sharing it, or
+      // after a flip). Its arrow styles change the panel height, and the overlay measures the
+      // panel before it reports the new position, so start from the side this trigger asks for.
+      if (this._targetPosition && this.popover._setRenderedPosition) {
+        const target = this._renderedPositionOf(this._targetPosition);
+        this.popover._setRenderedPosition(target.x, target.y);
+      }
+      overlayRef.attach(this._portal);
 
       this._subscribeToBackdrop();
       this._subscribeToDetachments();
@@ -515,23 +531,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   ): void {
     this._positionSubscription = position.positionChanges.subscribe(
       (change) => {
-        const posisionX: MdePopoverPositionX =
-          this.popoverService.getHorizontalPopoverAlignment(
-            change.connectionPair.overlayX
-          );
-        let posisionY: MdePopoverPositionY =
-          this.popoverService.getVerticalPopoverAlignment(
-            change.connectionPair.overlayY
-          );
-
-        if (!this.popover.overlapTrigger) {
-          posisionY =
-            posisionY === 'below'
-              ? 'above'
-              : posisionY === 'above'
-              ? 'below'
-              : posisionY;
-        }
+        const { x: posisionX, y: posisionY } = this._renderedPositionOf(
+          change.connectionPair
+        );
 
         // required for ChangeDetectionStrategy.OnPush
         this._changeDetectorRef.markForCheck();
@@ -551,6 +553,19 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
         });
       }
     );
+  }
+
+  /** The popover position (arrow side without overlap) that a connection pair renders. */
+  private _renderedPositionOf(pair: ConnectionPositionPair): {
+    x: MdePopoverPositionX;
+    y: MdePopoverPositionY;
+  } {
+    const x = this.popoverService.getHorizontalPopoverAlignment(pair.overlayX);
+    let y = this.popoverService.getVerticalPopoverAlignment(pair.overlayY);
+    if (!this.popover.overlapTrigger) {
+      y = y === 'below' ? 'above' : y === 'above' ? 'below' : y;
+    }
+    return { x, y };
   }
 
   /**
@@ -574,6 +589,7 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     }
 
     const targetPosition = this.popoverService.getPosition(posx, posy);
+    this._targetPosition = targetPosition;
     const positions = [targetPosition];
     const fallbackPosition = this.popoverService.getFallbacks(posx, posy);
     positions.push(...fallbackPosition);
@@ -595,6 +611,20 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     ) {
       offsetY = Number(this.popover.targetOffsetY);
       // offsetY = -10;
+    }
+
+    // The offsets move the panel away from (or along) the trigger on the requested side. A
+    // fallback on the opposite side (above instead of below, before instead of after) mirrors
+    // them, so a gap stays a gap instead of pushing the flipped panel onto the trigger.
+    for (const fallback of fallbackPosition) {
+      const v = verticalSide(fallback);
+      if (offsetY && v !== 0 && v === -verticalSide(targetPosition)) {
+        fallback.offsetY = -offsetY;
+      }
+      const h = horizontalSide(fallback);
+      if (offsetX && h !== 0 && h === -horizontalSide(targetPosition)) {
+        fallback.offsetX = -offsetX;
+      }
     }
 
     /**
@@ -635,4 +665,20 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
       this._openedByMouse = true;
     }
   }
+}
+
+/** 1 when the pair places the overlay below its origin, -1 above, 0 when they overlap vertically. */
+function verticalSide(pair: ConnectionPositionPair): number {
+  if (pair.originY === 'bottom' && pair.overlayY === 'top') {
+    return 1;
+  }
+  return pair.originY === 'top' && pair.overlayY === 'bottom' ? -1 : 0;
+}
+
+/** 1 when the pair places the overlay after its origin, -1 before, 0 when they overlap. */
+function horizontalSide(pair: ConnectionPositionPair): number {
+  if (pair.originX === 'end' && pair.overlayX === 'start') {
+    return 1;
+  }
+  return pair.originX === 'start' && pair.overlayX === 'end' ? -1 : 0;
 }

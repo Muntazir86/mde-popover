@@ -1,0 +1,58 @@
+:host { display: block; padding: 24px; }
+.list-page { max-width: 880px; margin: 0 auto; }
+.list-header { h2 { margin: 0 0 4px; } p { margin: 0 0 16px; opacity: .75; } }
+code { font-family: 'Roboto Mono', ui-monospace, monospace; font-size: 12px; }
+.toolbar mat-card-content { display: flex; flex-direction: column; gap: 12px; }
+.toolbar-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.gap-field { width: 110px; }
+.binding { opacity: .65; }
+.spacer { flex: 1; }
+.count { margin: 16px 0 8px; font-size: 13px; opacity: .65; }
+.rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 96px 80px 110px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(127, 127, 127, .25);
+  border-radius: 10px;
+  background: rgba(127, 127, 127, .04);
+  cursor: default;
+  transition: background-color .15s, border-color .15s, box-shadow .15s;
+  &:hover, &:focus-visible, &[aria-expanded='true'] {
+    background: rgba(127, 127, 127, .1);
+    border-color: rgba(127, 127, 127, .45);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .08);
+    outline: none;
+  }
+}
+.avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  color: #fff; font-weight: 500;
+}
+.name { display: flex; flex-direction: column; min-width: 0;
+  strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  small { opacity: .6; }
+}
+.rating { color: #f9a825; letter-spacing: 1px; }
+.price { font-variant-numeric: tabular-nums; text-align: right; font-weight: 500; }
+.stock { font-size: 12px; text-align: right; color: #2e7d32; &.out { color: #c62828; } }
+.empty { padding: 24px; text-align: center; opacity: .6; }
+.details { width: 280px; max-width: calc(100vw - 32px);
+  p { margin: 8px 0; font-size: 13px; }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 0; font-size: 13px; }
+  dt { opacity: .6; }
+  dd { margin: 0; }
+}
+.details-head { display: flex; align-items: center; gap: 10px;
+  div { display: flex; flex-direction: column; }
+  small { opacity: .6; font-size: 12px; }
+}
+@media (max-width: 640px) {
+  :host { padding: 12px; }
+  .row { grid-template-columns: 36px minmax(0, 1fr) 72px; }
+  .rating, .stock { display: none; }
+  .binding { display: none; }
+}
