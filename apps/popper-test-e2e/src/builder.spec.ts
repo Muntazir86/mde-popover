@@ -100,6 +100,29 @@ test.describe('builder playground', () => {
     expect(Math.abs(apart.y - overlapped.y)).toBeGreaterThan(40);
   });
 
+  test('keeps the requested side after the trigger is re-created', async ({ page }) => {
+    await openDemo(page, 'examples/builder');
+    const trigger = page.getByTestId('builder-trigger');
+    // Default playground position: center / below. Each control change re-creates the trigger,
+    // which builds a new overlay for the same popover.
+    for (const offsetY of ['0', '20', '0']) {
+      await page.getByTestId('builder-offset-y').fill(offsetY);
+      await trigger.click();
+      const panel = await expectPopoverOpen(page, CONTENT);
+      await expectPlaced(trigger, panel, 'below');
+      // Poll so the enter animation can finish before measuring the gap.
+      await expect
+        .poll(async () => {
+          const t = (await trigger.boundingBox())!;
+          const p = (await panel.boundingBox())!;
+          return Math.round(p.y - (t.y + t.height));
+        })
+        .toBe(Number(offsetY));
+      await page.getByTestId('builder-popover-close').click();
+      await expectPopoverClosed(page, CONTENT);
+    }
+  });
+
   test('arrow is visible and follows width and color at a center position', async ({ page }) => {
     await openDemo(page, 'examples/builder');
     const trigger = page.getByTestId('builder-trigger');
