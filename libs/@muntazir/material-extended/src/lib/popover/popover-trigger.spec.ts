@@ -472,6 +472,22 @@ describe('MdePopoverTrigger', () => {
       expect(panel()).toBeNull();
     });
 
+    it('does not move focus onto the trigger when a hover open closes', async () => {
+      const { button, trigger } = await setup();
+      const focus = vi.spyOn(button, 'focus');
+
+      button.dispatchEvent(mouse('mouseenter'));
+      await advance(200);
+      expect(panel()).not.toBeNull();
+      expect(probe(trigger)._openedByMouse).toBe(true);
+
+      button.dispatchEvent(mouse('mouseleave'));
+      await advance(200);
+      expect(panel()).toBeNull();
+      expect(focus).not.toHaveBeenCalled();
+      expect(probe(trigger)._openedByMouse).toBe(false);
+    });
+
     it('opens immediately when the trigger delay is zero', async () => {
       const { button, popover } = await setup((host) => {
         host.triggerEnterDelay = 0;
@@ -878,6 +894,65 @@ describe('MdePopoverTrigger', () => {
       expect(panel()?.querySelector('.mde-popover-direction-arrow')).not.toBeNull();
     });
 
+    it('mirrors the vertical offset on fallbacks that flip to the other side', async () => {
+      const { trigger } = await setup((host) => {
+        host.popoverTriggerOn = 'click';
+        host.popoverOverlap = false;
+        host.popoverPositionX = 'center';
+        host.popoverPositionY = 'below';
+        host.popoverOffsetY = 12;
+      });
+
+      trigger.openPopover();
+      const strategy = strategyOf(trigger);
+      const [primary, ...fallbacks] = strategy.positions;
+
+      expect(strategy._offsetY).toBe(12);
+      expect(`${primary.originY}/${primary.overlayY}`).toBe('bottom/top');
+      expect(primary.offsetY).toBeUndefined();
+      const above = fallbacks.filter((p) => p.originY === 'top' && p.overlayY === 'bottom');
+      const below = fallbacks.filter((p) => p.originY === 'bottom' && p.overlayY === 'top');
+      expect(above.length).toBeGreaterThan(0);
+      expect(above.every((p) => p.offsetY === -12)).toBe(true);
+      expect(below.every((p) => p.offsetY === undefined)).toBe(true);
+      expect(fallbacks.every((p) => p.offsetX === undefined)).toBe(true);
+    });
+
+    it('mirrors the horizontal offset on fallbacks that flip to the other side', async () => {
+      const { trigger } = await setup((host) => {
+        host.popoverTriggerOn = 'click';
+        host.popoverOverlap = false;
+        host.popoverPositionX = 'before';
+        host.popoverPositionY = 'center';
+        host.popoverOffsetX = -10;
+      });
+
+      trigger.openPopover();
+      const [primary, ...fallbacks] = strategyOf(trigger).positions;
+
+      expect(`${primary.originX}/${primary.overlayX}`).toBe('start/end');
+      const after = fallbacks.filter((p) => p.originX === 'end' && p.overlayX === 'start');
+      const before = fallbacks.filter((p) => p.originX === 'start' && p.overlayX === 'end');
+      expect(after.length).toBeGreaterThan(0);
+      expect(after.every((p) => p.offsetX === 10)).toBe(true);
+      expect(before.every((p) => p.offsetX === undefined)).toBe(true);
+    });
+
+    it('leaves fallbacks alone without an offset or when the request overlaps the trigger', async () => {
+      const { trigger } = await setup((host) => {
+        host.popoverTriggerOn = 'click';
+        host.popoverOverlap = true;
+        host.popoverPositionX = 'start';
+        host.popoverPositionY = 'start';
+        host.popoverOffsetX = 5;
+        host.popoverOffsetY = 5;
+      });
+
+      trigger.openPopover();
+      const positions = strategyOf(trigger).positions;
+      expect(positions.every((p) => p.offsetX === undefined && p.offsetY === undefined)).toBe(true);
+    });
+
     it('shifts non-overlapping fallback positions off the anchor', async () => {
       const { trigger } = await setup((host) => {
         host.popoverTriggerOn = 'click';
@@ -1231,6 +1306,48 @@ describe('MdePopoverTrigger', () => {
       reportPosition(strategyFor(first));
       expect(popover.positionY).toBe('above');
       expect(popover._classList['mde-popover-above']).toBe(true);
+      first.closePopover();
+      shared.destroy();
+    });
+
+    it('starts every open from the side the trigger asks for, not where the last one rendered', async () => {
+      const { shared, triggerAt } = await setupShared();
+      const first = triggerAt('button.first');
+      const second = triggerAt('button.second');
+      const popover = shared.debugElement.query(By.directive(MdePopover))
+        .componentInstance as MdePopover;
+
+      first.openPopover();
+      await shared.whenStable();
+      const flipped = strategyFor(first);
+      // The CDK used the fallback above the trigger: the arrow moves under the content.
+      flipped.positionChanges.next({
+        connectionPair: flipped.positions[1],
+        scrollableViewProperties: {
+          isOriginClipped: false,
+          isOriginOutsideView: false,
+          isOverlayClipped: false,
+          isOverlayOutsideView: false,
+        },
+      });
+      expect(popover.positionY).toBe('below');
+      expect(popover.popoverContentStyles['margin-top']).toBe('-16px');
+      first.closePopover();
+
+      // The overlay measures the panel before it reports a position, so the panel must already
+      // have the requested side's arrow styles (and height) when it is attached.
+      const spy = vi.spyOn(popover, '_setRenderedPosition');
+      second.openPopover();
+      expect(spy).toHaveBeenCalledWith('center', 'above');
+      expect(popover.popoverContentStyles['margin-top']).toBe('0px');
+      expect(popover._classList['mde-popover-above']).toBe(true);
+      expect(popover._classList['mde-popover-below']).toBe(false);
+      second.closePopover();
+
+      // Reopening the flipped trigger also starts from its requested side.
+      spy.mockClear();
+      first.openPopover();
+      expect(spy).toHaveBeenCalledWith('center', 'above');
       first.closePopover();
       shared.destroy();
     });
