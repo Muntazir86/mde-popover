@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Nx Release prepends generated notes for later versions above this hand-written history. The 5.x–9.x entries were reconstructed from git history and the package manifests on the `5.x`–`9.x` branches. This repository has no git tags for those lines, so the notes only include what those commits and manifests record.
 
+## [Unreleased]
+
+### Changed
+
+- The package is licensed under ISC, and a LICENSE file now ships in the npm package and sits at the repository root. It keeps the MIT notice of the original Angular Popover by Joe Jordan Brown. The READMEs say ISC and no longer show a FOSSA badge for the upstream repository.
+- README: Documentation, Changelog and CONTRIBUTING links point at the `10.x` branch, the install command targets 10.x and Angular 21, examples use `mat-button`/`mat-icon` and show a standalone import, and the API tables list `mdePopoverScrollStrategy` and `mdePopoverDisableAnimation`. `@angular/animations` is listed as a peer dependency (the package imports it for the deprecated `transformPopover` export), and the package description no longer says it was generated with Angular CLI.
+
 ## [10.0.1] - 2026-10-18
 
 Bug fixes backported from 11.0.0.
