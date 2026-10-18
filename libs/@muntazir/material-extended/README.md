@@ -189,12 +189,8 @@ Removes the popover from the DOM.
 
 Please report bugs and issues [here](https://github.com/Muntazir86/mde-popover/issues).
 
-###
-
 ### License
 
-MIT © [Joe Jordan Brown](https://github.com/joejordanbrown)
+ISC © Ghulam Shabbir ([Muntazir86](https://github.com/Muntazir86)). See [LICENSE](https://github.com/Muntazir86/mde-popover/blob/10.x/LICENSE).
 
-[Angular Popover by UIXD](https://uixd.co.uk)
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover?ref=badge_large)
+Based on [Angular Popover](https://github.com/joejordanbrown/popover) by [Joe Jordan Brown](https://github.com/joejordanbrown) ([UIXD](https://uixd.co.uk)), released under the MIT License. Its copyright notice is kept in the LICENSE file.
