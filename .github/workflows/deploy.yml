@@ -1,0 +1,67 @@
+# Publishes the demo to the gh-pages branch after CI passes for a push to
+# master. No other branch, and no pull request, deploys.
+#
+# workflow_run only uses the copy of this file on the default branch (master),
+# so it is safe for the file to exist, unchanged, on maintenance branches.
+
+name: Deploy demo
+
+on:
+  workflow_run:
+    workflows: ["Node.js CI"]
+    types: [completed]
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-gh-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'master' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # push to gh-pages
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: true
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build library
+        run: npm run build:prod
+      - name: Deploy to gh-pages
+        run: |
+          set -euo pipefail
+          if [[ $- == *x* ]]; then
+            echo "Refusing to deploy with shell tracing enabled."
+            exit 1
+          fi
+          # actions/checkout stored an Authorization header for GITHUB_TOKEN.
+          # angular-cli-ghpages copies GH_TOKEN or GITHUB_TOKEN into the clone
+          # URL and logs that URL, so hide those variables and authenticate with
+          # the header instead.
+          header="$(git config --local --get http.https://github.com/.extraheader)"
+          printf '::add-mask::%s\n' "${header}"
+          env \
+            -u GH_TOKEN \
+            -u GITHUB_TOKEN \
+            -u PERSONAL_TOKEN \
+            GIT_TERMINAL_PROMPT=0 \
+            GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0=http.https://github.com/.extraheader \
+            GIT_CONFIG_VALUE_0="${header}" \
+            npm run deploy
