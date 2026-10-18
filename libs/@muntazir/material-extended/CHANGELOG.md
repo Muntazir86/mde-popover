@@ -6,6 +6,10 @@ All notable changes to `@muntazir86/material-extended` 9.x (Angular 20) are docu
 
 Bug fixes backported from 10.0.0 and 11.0.0. No API or behaviour changes beyond these fixes.
 
+### Changed
+
+- The package is licensed under ISC, and a LICENSE file now ships in the npm package and sits at the repository root. It keeps the MIT notice of the original Angular Popover by Joe Jordan Brown. The READMEs say ISC and no longer show a FOSSA badge for the upstream repository.
+
 ### Fixed
 
 - A popover without `mdePopoverOverlapTrigger` no longer flips to the other side of the trigger every time a new overlay is built for it, for example when several triggers share the popover or a trigger is re-created inside `@if`/`@for`. The rendered (fallback) position used to overwrite the requested position.

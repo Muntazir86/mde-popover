@@ -1,6 +1,7 @@
 {
   "name": "popover",
   "version": "9.0.1",
+  "license": "ISC",
   "scripts": {
     "ng": "ng",
     "start": "nx serve popper-test",
