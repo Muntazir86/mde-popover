@@ -104,15 +104,6 @@
           "{projectRoot}/**/*.html"
         ]
       }
-    },
-    "deploy": {
-      "executor": "angular-cli-ghpages:deploy",
-      "options": {
-        "repo": "https://github.com/Muntazir86/mde-popover.git",
-        "branch": "gh-pages",
-        "name": "Ghulam Shabbir",
-        "email": "ghulamshabbirmtn500@gmail.com"
-      }
     }
   },
   "implicitDependencies": ["@muntazir/material-extended"]

@@ -43,25 +43,30 @@ jobs:
         run: npm ci
       - name: Build library
         run: npm run build:prod
+      - name: Build demo
+        run: npm run build:demo
       - name: Deploy to gh-pages
+        env:
+          DEMO_DIR: dist/apps/popper-test/browser
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
-          if [[ $- == *x* ]]; then
-            echo "Refusing to deploy with shell tracing enabled."
-            exit 1
+          # Plain git, authenticated by the header that actions/checkout stored
+          # for GITHUB_TOKEN (persist-credentials). No token is put in a URL.
+          test -f "$DEMO_DIR/index.html"
+          cp "$DEMO_DIR/index.html" "$DEMO_DIR/404.html" # SPA fallback for deep links
+          touch "$DEMO_DIR/.nojekyll"
+          site="$RUNNER_TEMP/gh-pages"
+          git fetch --no-tags --depth=1 origin gh-pages
+          git worktree add --detach "$site" FETCH_HEAD
+          find "$site" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$DEMO_DIR"/. "$site"/
+          cd "$site"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "The demo on gh-pages is already up to date."
+            exit 0
           fi
-          # actions/checkout stored an Authorization header for GITHUB_TOKEN.
-          # angular-cli-ghpages copies GH_TOKEN or GITHUB_TOKEN into the clone
-          # URL and logs that URL, so hide those variables and authenticate with
-          # the header instead.
-          header="$(git config --local --get http.https://github.com/.extraheader)"
-          printf '::add-mask::%s\n' "${header}"
-          env \
-            -u GH_TOKEN \
-            -u GITHUB_TOKEN \
-            -u PERSONAL_TOKEN \
-            GIT_TERMINAL_PROMPT=0 \
-            GIT_CONFIG_COUNT=1 \
-            GIT_CONFIG_KEY_0=http.https://github.com/.extraheader \
-            GIT_CONFIG_VALUE_0="${header}" \
-            npm run deploy
+          git -c user.name="Ghulam Shabbir" -c user.email="ghulamshabbirmtn500@gmail.com" \
+            commit --quiet -m "Deploy demo from ${SOURCE_SHA}"
+          git push origin HEAD:refs/heads/gh-pages

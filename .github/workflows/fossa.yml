@@ -1,0 +1,41 @@
+# FOSSA license and security scan for every branch.
+#
+# Runs `fossa analyze` and then `fossa test`, so the job fails when the FOSSA
+# policy reports license or security issues. Scope and project ID are in
+# .fossa.yml. Without the FOSSA_API_KEY secret (for example a pull request
+# from a fork) the scan is skipped and the job passes with a notice.
+
+name: FOSSA
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fossa:
+    runs-on: ubuntu-latest
+    env:
+      FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
+    steps:
+      - name: Skip without FOSSA_API_KEY
+        if: env.FOSSA_API_KEY == ''
+        run: echo "::notice title=FOSSA skipped::The FOSSA_API_KEY secret is not available to this run (not set, or a pull request from a fork)."
+      - uses: actions/checkout@v5
+        if: env.FOSSA_API_KEY != ''
+        with:
+          persist-credentials: false
+      - name: FOSSA analyze and test
+        if: env.FOSSA_API_KEY != ''
+        uses: fossas/fossa-action@29693cc50323968e039056be419b32989fc5880c # v2.0.0
+        with:
+          api-key: ${{ env.FOSSA_API_KEY }}
+          branch: ${{ github.head_ref || github.ref_name }}
+          run-tests: true
