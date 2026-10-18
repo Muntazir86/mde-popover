@@ -1,6 +1,6 @@
 {
   "name": "@muntazir86/material-extended",
-  "version": "9.0.0",
+  "version": "9.0.1",
   "peerDependencies": {
     "@angular/cdk": "^20.2.9",
     "@angular/common": "^20.3.6",

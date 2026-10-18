@@ -21,6 +21,7 @@ import {
   OverlayConfig,
   FlexibleConnectedPositionStrategy,
   ScrollStrategy,
+  ConnectionPositionPair,
 } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 
@@ -61,11 +62,16 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   private _overlayRef: OverlayRef | null = null;
   private _popoverOpen = false;
   private _halt = false;
-  private _backdropSubscription: Subscription;
-  private _positionSubscription: Subscription;
-  private _detachmentsSubscription: Subscription;
+  /** The preferred connection pair of this trigger's overlay. */
+  private _targetPosition: ConnectionPositionPair | null = null;
+  private _backdropSubscription: Subscription | null = null;
+  private _positionSubscription: Subscription | null = null;
+  private _detachmentsSubscription: Subscription | null = null;
+  private _closeSubscription: Subscription | null = null;
 
-  private _mouseoverTimer: any;
+  private _mouseoverTimer: any = null;
+  private _mouseleaveTimer: any = null;
+  private _destroyed = false;
 
   // tracking input type is necessary so it's possible to only auto-focus
   // the first item of the list when the popover is opened via the keyboard
@@ -145,7 +151,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this._checkPopover();
     this._setCurrentConfig();
-    this.popover.close.subscribe(() => this.closePopover());
+    this._closeSubscription = this.popover.close
+      .pipe(takeUntil(this._onDestroy))
+      .subscribe(() => this.closePopover());
   }
 
   ngOnDestroy() {
@@ -165,35 +173,35 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
       this.popover.triggerEvent = this.triggerEvent;
     }
 
-    if (this.enterDelay) {
+    if (this.enterDelay != null) {
       this.popover.enterDelay = this.enterDelay;
     }
 
-    if (this.leaveDelay) {
+    if (this.leaveDelay != null) {
       this.popover.leaveDelay = this.leaveDelay;
     }
 
-    if (this.overlapTrigger === true || this.overlapTrigger === false) {
+    if (this.overlapTrigger != null) {
       this.popover.overlapTrigger = this.overlapTrigger;
     }
 
-    if (this.targetOffsetX) {
+    if (this.targetOffsetX != null) {
       this.popover.targetOffsetX = this.targetOffsetX;
     }
 
-    if (this.targetOffsetY) {
+    if (this.targetOffsetY != null) {
       this.popover.targetOffsetY = this.targetOffsetY;
     }
 
-    if (this.arrowOffsetX) {
+    if (this.arrowOffsetX != null) {
       this.popover.arrowOffsetX = this.arrowOffsetX;
     }
 
-    if (this.arrowOffsetY) {
+    if (this.arrowOffsetY != null) {
       this.popover.arrowOffsetY = this.arrowOffsetY;
     }
 
-    if (this.arrowWidth) {
+    if (this.arrowWidth != null) {
       this.popover.arrowWidth = this.arrowWidth;
     }
 
@@ -201,12 +209,15 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
       this.popover.arrowColor = this.arrowColor;
     }
 
-    if (this.closeOnClick === true || this.closeOnClick === false) {
+    if (this.closeOnClick != null) {
       this.popover.closeOnClick = this.closeOnClick;
     }
+    // `mdePopoverTriggerOn` may live on the popover. Click handling already
+    // reads popover.triggerEvent, and the trigger has to stay above a click
+    // backdrop in the same case.
     if (
       !this.closeOnClickTrigger &&
-      this.triggerEvent === 'click' &&
+      this.popover.triggerEvent === 'click' &&
       this.backdropCloseOnClick
     ) {
       this._elementRef.nativeElement.style.zIndex = '999999';
@@ -234,8 +245,17 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   @HostListener('mouseenter', ['$event'])
   onMouseEnter(event: MouseEvent): void {
     this._halt = false;
+    // Returning to the trigger cancels a close that was waiting on leaveDelay.
+    this._clearTimer('_mouseleaveTimer');
     if (this.popover.triggerEvent === 'hover') {
+      this._clearTimer('_mouseoverTimer');
       this._mouseoverTimer = setTimeout(() => {
+        this._mouseoverTimer = null;
+        // A hover open is a pointer open: closing it must not move focus onto this trigger
+        // (with a shared popover that refocused the row the pointer had already left).
+        if (!this._popoverOpen) {
+          this._openedByMouse = true;
+        }
         this.openPopover();
       }, this.popover.enterDelay);
     }
@@ -244,12 +264,11 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   @HostListener('mouseleave', ['$event'])
   onMouseLeave(event: MouseEvent): void {
     if (this.popover.triggerEvent === 'hover') {
-      if (this._mouseoverTimer) {
-        clearTimeout(this._mouseoverTimer);
-        this._mouseoverTimer = null;
-      }
+      this._clearTimer('_mouseoverTimer');
       if (this._popoverOpen) {
-        setTimeout(() => {
+        this._clearTimer('_mouseleaveTimer');
+        this._mouseleaveTimer = setTimeout(() => {
+          this._mouseleaveTimer = null;
           if (!this.popover.closeDisabled) {
             this.closePopover();
           }
@@ -268,7 +287,15 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   /** Opens the popover. */
   openPopover(): void {
     if (!this._popoverOpen && !this._halt && !this.disablePopoverTrigger) {
-      this._createOverlay().attach(this._portal);
+      const overlayRef = this._createOverlay();
+      // The popover may have last rendered on another side (for another trigger sharing it, or
+      // after a flip). Its arrow styles change the panel height, and the overlay measures the
+      // panel before it reports the new position, so start from the side this trigger asks for.
+      if (this._targetPosition && this.popover._setRenderedPosition) {
+        const target = this._renderedPositionOf(this._targetPosition);
+        this.popover._setRenderedPosition(target.x, target.y);
+      }
+      overlayRef.attach(this._portal);
 
       this._subscribeToBackdrop();
       this._subscribeToDetachments();
@@ -282,7 +309,7 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     if (this._overlayRef) {
       this._overlayRef.detach();
       this._resetPopover();
-      if (!this.closeOnClickTrigger && this.triggerEvent === 'click') {
+      if (!this.closeOnClickTrigger && this.popover.triggerEvent === 'click') {
         this._elementRef.nativeElement.blur();
       }
     }
@@ -290,18 +317,32 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
 
   /** Removes the popover from the DOM. */
   destroyPopover(): void {
-    if (this._mouseoverTimer) {
-      clearTimeout(this._mouseoverTimer);
-      this._mouseoverTimer = null;
-    }
+    this._clearHoverTimers();
     if (this._overlayRef) {
       this._overlayRef.dispose();
       this._overlayRef = null;
-      this._cleanUpSubscriptions();
     }
+    this._cleanUpSubscriptions();
 
-    this._onDestroy.next();
-    this._onDestroy.complete();
+    // ngOnDestroy also calls this, so a manual destroy must not complete twice.
+    if (!this._destroyed) {
+      this._destroyed = true;
+      this._onDestroy.next();
+      this._onDestroy.complete();
+    }
+  }
+
+  private _clearTimer(field: '_mouseoverTimer' | '_mouseleaveTimer'): void {
+    const timer = this[field];
+    if (timer) {
+      clearTimeout(timer);
+      this[field] = null;
+    }
+  }
+
+  private _clearHoverTimers(): void {
+    this._clearTimer('_mouseoverTimer');
+    this._clearTimer('_mouseleaveTimer');
   }
 
   /** Focuses the popover trigger. */
@@ -321,10 +362,15 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
    * explicitly when the popover is closed or destroyed.
    */
   private _subscribeToBackdrop(): void {
+    this._backdropSubscription?.unsubscribe();
+    this._backdropSubscription = null;
     if (this._overlayRef) {
       /** Only subscribe to backdrop if trigger event is click */
-      if (this.triggerEvent === 'click' && this.backdropCloseOnClick === true) {
-        this._overlayRef
+      if (
+        this.popover.triggerEvent === 'click' &&
+        this.backdropCloseOnClick === true
+      ) {
+        this._backdropSubscription = this._overlayRef
           .backdropClick()
           .pipe(takeUntil(this.popoverClosed), takeUntil(this._onDestroy))
           .subscribe(() => {
@@ -335,8 +381,10 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   }
 
   private _subscribeToDetachments(): void {
+    this._detachmentsSubscription?.unsubscribe();
+    this._detachmentsSubscription = null;
     if (this._overlayRef) {
-      this._overlayRef
+      this._detachmentsSubscription = this._overlayRef
         .detachments()
         .pipe(takeUntil(this.popoverClosed), takeUntil(this._onDestroy))
         .subscribe(() => {
@@ -362,7 +410,12 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
 
     // Focus only needs to be reset to the host element if the popover was opened
     // by the keyboard and manually shifted to the first popover item.
-    if (!this._openedByMouse) {
+    // A "none" trigger is opened programmatically while focus stays on some other
+    // element (an input inside or beside the host). Moving focus onto the host
+    // pulls it away from that element.
+    // Use the popover's event so `mdePopoverTriggerOn="none"` on the popover
+    // (not only on the trigger) keeps focus on the field that opened it.
+    if (!this._openedByMouse && this.popover.triggerEvent !== 'none') {
       this.focus();
     }
     this._openedByMouse = false;
@@ -426,8 +479,12 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     const overlayState = new OverlayConfig();
     overlayState.positionStrategy = this._getPositionStrategy();
 
-    /** Display overlay backdrop if trigger event is click */
-    if (this.triggerEvent === 'click') {
+    /**
+     * Display overlay backdrop if the effective trigger event is click.
+     * `mdePopoverTriggerOn` may be set on the popover rather than the trigger,
+     * so the popover's triggerEvent is the value that click handling uses.
+     */
+    if (this.popover.triggerEvent === 'click') {
       overlayState.hasBackdrop = true;
       overlayState.backdropClass = 'cdk-overlay-transparent-backdrop';
     }
@@ -448,7 +505,6 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   ): ScrollStrategy {
     switch (strategy) {
       case 'noop':
-        console.log('noop');
         return this._overlay.scrollStrategies.noop();
       case 'close':
         return this._overlay.scrollStrategies.close();
@@ -470,36 +526,41 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   ): void {
     this._positionSubscription = position.positionChanges.subscribe(
       (change) => {
-        const posisionX: MdePopoverPositionX =
-          this.popoverService.getHorizontalPopoverAlignment(
-            change.connectionPair.overlayX
-          );
-        let posisionY: MdePopoverPositionY =
-          this.popoverService.getVerticalPopoverAlignment(
-            change.connectionPair.overlayY
-          );
-
-        if (!this.popover.overlapTrigger) {
-          posisionY =
-            posisionY === 'below'
-              ? 'above'
-              : posisionY === 'above'
-              ? 'below'
-              : posisionY;
-        }
+        const { x: posisionX, y: posisionY } = this._renderedPositionOf(
+          change.connectionPair
+        );
 
         // required for ChangeDetectionStrategy.OnPush
         this._changeDetectorRef.markForCheck();
 
         this.popover.zone.run(() => {
-          this.popover.positionX = posisionX;
-          this.popover.positionY = posisionY;
-          this.popover.setCurrentStyles();
-
-          this.popover.setPositionClasses(posisionX, posisionY);
+          // Record the rendered position without overwriting the requested one. Writing it to
+          // positionX/positionY made the next overlay built for this popover (another trigger
+          // sharing it, or a re-created trigger) start from the flipped position.
+          if (this.popover._setRenderedPosition) {
+            this.popover._setRenderedPosition(posisionX, posisionY);
+          } else {
+            this.popover.positionX = posisionX;
+            this.popover.positionY = posisionY;
+            this.popover.setCurrentStyles();
+            this.popover.setPositionClasses(posisionX, posisionY);
+          }
         });
       }
     );
+  }
+
+  /** The popover position (arrow side without overlap) that a connection pair renders. */
+  private _renderedPositionOf(pair: ConnectionPositionPair): {
+    x: MdePopoverPositionX;
+    y: MdePopoverPositionY;
+  } {
+    const x = this.popoverService.getHorizontalPopoverAlignment(pair.overlayX);
+    let y = this.popoverService.getVerticalPopoverAlignment(pair.overlayY);
+    if (!this.popover.overlapTrigger) {
+      y = y === 'below' ? 'above' : y === 'above' ? 'below' : y;
+    }
+    return { x, y };
   }
 
   /**
@@ -508,8 +569,9 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
    * @returns ConnectedPositionStrategy
    */
   private _getPositionStrategy(): FlexibleConnectedPositionStrategy {
-    let posx = this.popover.positionX;
-    let posy = this.popover.positionY;
+    const requested = this.popover._requestedPosition;
+    let posx = requested ? requested.x : this.popover.positionX;
+    let posy = requested ? requested.y : this.popover.positionY;
 
     /** Reverse overlayY and fallbackOverlayY when overlapTrigger is false */
     if (!this.popover.overlapTrigger) {
@@ -522,6 +584,7 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
     }
 
     const targetPosition = this.popoverService.getPosition(posx, posy);
+    this._targetPosition = targetPosition;
     const positions = [targetPosition];
     const fallbackPosition = this.popoverService.getFallbacks(posx, posy);
     positions.push(...fallbackPosition);
@@ -545,6 +608,20 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
       // offsetY = -10;
     }
 
+    // The offsets move the panel away from (or along) the trigger on the requested side. A
+    // fallback on the opposite side (above instead of below, before instead of after) mirrors
+    // them, so a gap stays a gap instead of pushing the flipped panel onto the trigger.
+    for (const fallback of fallbackPosition) {
+      const v = verticalSide(fallback);
+      if (offsetY && v !== 0 && v === -verticalSide(targetPosition)) {
+        fallback.offsetY = -offsetY;
+      }
+      const h = horizontalSide(fallback);
+      if (offsetX && h !== 0 && h === -horizontalSide(targetPosition)) {
+        fallback.offsetX = -offsetX;
+      }
+    }
+
     /**
      * For overriding position element, when mdePopoverTargetAt has a valid element reference.
      * Useful for sticking popover to parent element and offsetting arrow to trigger element.
@@ -566,15 +643,14 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
   }
 
   private _cleanUpSubscriptions(): void {
-    if (this._backdropSubscription) {
-      this._backdropSubscription.unsubscribe();
-    }
-    if (this._positionSubscription) {
-      this._positionSubscription.unsubscribe();
-    }
-    if (this._detachmentsSubscription) {
-      this._detachmentsSubscription.unsubscribe();
-    }
+    this._backdropSubscription?.unsubscribe();
+    this._backdropSubscription = null;
+    this._positionSubscription?.unsubscribe();
+    this._positionSubscription = null;
+    this._detachmentsSubscription?.unsubscribe();
+    this._detachmentsSubscription = null;
+    this._closeSubscription?.unsubscribe();
+    this._closeSubscription = null;
   }
 
   @HostListener('mousedown', ['$event']) _handleMousedown(
@@ -584,4 +660,20 @@ export class MdePopoverTrigger implements AfterViewInit, OnDestroy {
       this._openedByMouse = true;
     }
   }
+}
+
+/** 1 when the pair places the overlay below its origin, -1 above, 0 when they overlap vertically. */
+function verticalSide(pair: ConnectionPositionPair): number {
+  if (pair.originY === 'bottom' && pair.overlayY === 'top') {
+    return 1;
+  }
+  return pair.originY === 'top' && pair.overlayY === 'bottom' ? -1 : 0;
+}
+
+/** 1 when the pair places the overlay after its origin, -1 before, 0 when they overlap. */
+function horizontalSide(pair: ConnectionPositionPair): number {
+  if (pair.originX === 'end' && pair.overlayX === 'start') {
+    return 1;
+  }
+  return pair.originX === 'start' && pair.overlayX === 'end' ? -1 : 0;
 }
