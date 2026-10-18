@@ -1,35 +1,52 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+# CI for every branch: library unit tests and builds.
+#
+# 9.x (Angular 20) variant of the workflow on master, 10.x and 11.x. 9.x predates
+# ESLint, Vitest and Playwright, so it has no lint, demo unit test or e2e steps,
+# and `npm test` runs the library's Karma specs in headless Chrome. Everything
+# else matches the other branches.
+#
+# It runs on pushes to any branch and on pull requests into any branch. A pull
+# request from a branch in this repository is already tested by the push run
+# for the same commit, so its pull_request run skips the jobs; pull requests
+# from forks run them. The Node.js version comes from .nvmrc, so this file is
+# identical on master and the maintenance branches (10.x, 11.x, ...).
+#
+# Deploying the demo to gh-pages is in deploy.yml (master only).
 
 name: Node.js CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["**"]
   pull_request:
-    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
 jobs:
   build:
-
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [22.0.0]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Prepare and deploy
-      env: 
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      run: |
-        npm install
-        npm run build:prod
-        npm run deploy
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Library unit tests
+        run: npm test
+      - name: Build library
+        run: npm run build:prod
+      - name: Build demo
+        run: npm run build:demo
+      - name: Build library with ng-packagr
+        run: npm run build:pack

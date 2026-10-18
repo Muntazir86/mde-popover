@@ -12,7 +12,7 @@
     "publish": "npm run build:prod && npm publish --access public ./dist/@muntazir/material-extended",
     "deploy": "nx run popper-test:deploy --base-href=/mde-popover/",
     "watch": "nx build --watch --configuration development",
-    "test": "nx test"
+    "test": "nx test @muntazir/material-extended --watch=false --browsers=ChromeHeadlessNoSandbox"
   },
   "private": true,
   "dependencies": {
