@@ -15,6 +15,25 @@ test.describe('home page popovers', () => {
     await openDemo(page);
   });
 
+  test('links every example page: Form, Builder and List', async ({ page }) => {
+    // The home page is the only place the demo links its examples (the toolbar holds popover
+    // triggers only), so each example must be listed here.
+    const examples = [
+      { link: 'home-form-link', name: 'Form', url: /#\/examples\/form$/, ready: 'form-company' },
+      { link: 'home-builder-link', name: 'Builder', url: /#\/examples\/builder$/, ready: 'builder-trigger' },
+      { link: 'home-list-link', name: 'List', url: /#\/examples\/list$/, ready: 'list-heading' },
+    ];
+    await expect(page.locator('a[data-testid^="home-"][data-testid$="-link"]')).toHaveText(
+      examples.map((e) => e.name)
+    );
+    for (const example of examples) {
+      await openDemo(page);
+      await page.getByTestId(example.link).click();
+      await expect(page).toHaveURL(example.url);
+      await expect(page.getByTestId(example.ready).first()).toBeVisible();
+    }
+  });
+
   test('hover popover opens, stays open over its content, and closes on leave or click', async ({
     page,
   }) => {

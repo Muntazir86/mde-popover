@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+  expectArrow,
   clickOutside,
   expectPlaced,
   expectPopoverClosed,
@@ -81,23 +82,56 @@ test.describe('builder playground', () => {
     await expect(snippet).not.toContainText('mdePopoverPositionY');
   });
 
-  test('overlap changes geometry at a center position', async ({ page }) => {
+  test('overlap removes the arrow and its padding at a center position', async ({ page }) => {
     await openDemo(page, 'examples/builder');
     const trigger = page.getByTestId('builder-trigger');
-    const measure = async () => {
+    const measure = async (arrow: boolean) => {
       await trigger.click();
       const panel = await expectPopoverOpen(page, CONTENT);
+      await expectArrow(panel, arrow);
+      // The panel scales in; measure it once the enter animation has finished.
+      await expect
+        .poll(() => panel.evaluate((el) => el.getAnimations({ subtree: true }).length))
+        .toBe(0);
       const box = await panel.boundingBox();
       await page.getByTestId('builder-popover-close').click();
       await expectPopoverClosed(page, CONTENT);
       return box!;
     };
-    // Default playground position: center / below.
-    const apart = await measure();
+    // Default playground position: center / below. Both panels open right below the trigger;
+    // without overlap the arrow adds its width as padding on every side.
+    const apart = await measure(true);
     await page.getByTestId('builder-overlap').getByRole('switch').click();
     await expect(page.getByTestId('builder-snippet')).not.toContainText('mdePopoverOverlapTrigger');
-    const overlapped = await measure();
-    expect(Math.abs(apart.y - overlapped.y)).toBeGreaterThan(40);
+    const overlapped = await measure(false);
+    const below = (await trigger.boundingBox())!;
+    expect(Math.round(apart.y)).toBe(Math.round(below.y + below.height));
+    expect(Math.round(overlapped.y)).toBe(Math.round(below.y + below.height));
+    expect(Math.round(apart.height - overlapped.height)).toBe(16);
+    expect(Math.round(apart.width - overlapped.width)).toBe(16);
+  });
+
+  test('keeps the requested side after the trigger is re-created', async ({ page }) => {
+    await openDemo(page, 'examples/builder');
+    const trigger = page.getByTestId('builder-trigger');
+    // Default playground position: center / below. Each control change re-creates the trigger,
+    // which builds a new overlay for the same popover.
+    for (const offsetY of ['0', '20', '0']) {
+      await page.getByTestId('builder-offset-y').fill(offsetY);
+      await trigger.click();
+      const panel = await expectPopoverOpen(page, CONTENT);
+      await expectPlaced(trigger, panel, 'below');
+      // Poll so the enter animation can finish before measuring the gap.
+      await expect
+        .poll(async () => {
+          const t = (await trigger.boundingBox())!;
+          const p = (await panel.boundingBox())!;
+          return Math.round(p.y - (t.y + t.height));
+        })
+        .toBe(Number(offsetY));
+      await page.getByTestId('builder-popover-close').click();
+      await expectPopoverClosed(page, CONTENT);
+    }
   });
 
   test('arrow is visible and follows width and color at a center position', async ({ page }) => {
