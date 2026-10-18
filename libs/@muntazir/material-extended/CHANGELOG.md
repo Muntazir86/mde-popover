@@ -11,6 +11,7 @@ Nx Release prepends generated notes for later versions above this hand-written h
 ### Changed
 
 - The package is licensed under ISC, and a LICENSE file now ships in the npm package and sits at the repository root. It keeps the MIT notice of the original Angular Popover by Joe Jordan Brown. The READMEs say ISC and no longer show a FOSSA badge for the upstream repository.
+- README: Documentation, Changelog and CONTRIBUTING links point at the `11.x` branch, the install command targets 11.x and Angular 22, examples use `mat-button`/`mat-icon` and show a standalone import, and the API tables list `mdePopoverScrollStrategy` and `mdePopoverDisableAnimation`.
 
 ## [11.0.0] - 2026-10-17
 
