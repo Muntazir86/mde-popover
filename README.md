@@ -3,12 +3,11 @@
 ![npm (scoped)](https://img.shields.io/npm/v/%40muntazir86/material-extended?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40muntazir86%2Fmaterial-extended)
 
 #### Links
-[Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) | 
+
+[Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) |
 [Documentation](https://github.com/Muntazir86/mde-popover/blob/master/libs/@muntazir/material-extended/src/lib/popover/popover.md) | [Changelog](libs/@muntazir/material-extended/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@muntazir86/material-extended)
 
 Commit messages and the manual release flow are in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-
 
 ### Project status
 
@@ -193,13 +192,8 @@ Removes the popover from the DOM.
 
 Please report bugs and issues [here](https://github.com/Muntazir86/mde-popover/issues).
 
-###
-
 ### License
 
-MIT © [Joe Jordan Brown](https://github.com/joejordanbrown)
+ISC © Ghulam Shabbir ([Muntazir86](https://github.com/Muntazir86)). See [LICENSE](LICENSE).
 
-[Angular Popover by UIXD](https://uixd.co.uk)
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjoejordanbrown%2Fpopover?ref=badge_large)
-
+Based on [Angular Popover](https://github.com/joejordanbrown/popover) by [Joe Jordan Brown](https://github.com/joejordanbrown) ([UIXD](https://uixd.co.uk)), released under the MIT License. Its copyright notice is kept in the LICENSE file.

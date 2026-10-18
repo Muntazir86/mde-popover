@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Nx Release prepends generated notes for later versions above this hand-written history. The 5.x–9.x entries were reconstructed from git history and the package manifests on the `5.x`–`9.x` branches. This repository has no git tags for those lines, so the notes only include what those commits and manifests record.
 
+## [Unreleased]
+
+### Changed
+
+- The package is licensed under ISC, and a LICENSE file now ships in the npm package and sits at the repository root. It keeps the MIT notice of the original Angular Popover by Joe Jordan Brown. The READMEs say ISC and no longer show a FOSSA badge for the upstream repository.
+
 ## [11.0.0] - 2026-10-18
 
 Angular 22 support. The workspace moves to Nx 23.3, Angular and Angular Material/CDK 22.1, and TypeScript 6.0. Node.js 22.22.3 or later (or 24.15+) is required, matching Angular 22. Peer dependencies on `@angular/cdk`, `@angular/common`, and `@angular/core` are `^22.0.0`. Maintenance for Angular 21 continues on the `10.x` branch.
