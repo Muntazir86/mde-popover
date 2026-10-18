@@ -10,6 +10,8 @@
   position: fixed;
   right: 40px;
   bottom: 40px;
+  // Stay above page content that is positioned or scrolls (the playground cards).
+  z-index: 10;
 }
 
 .container {

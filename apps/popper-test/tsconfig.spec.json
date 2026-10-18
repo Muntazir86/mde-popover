@@ -3,10 +3,10 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "types": ["vitest/globals"],
-    "lib": ["ES2022", "DOM", "ESNext.Disposable"],
     "moduleResolution": "bundler",
     "module": "preserve",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
 }

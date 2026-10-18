@@ -4,7 +4,10 @@
   "projectType": "application",
   "sourceRoot": "apps/popper-test/src",
   "prefix": "app",
-  "tags": ["type:app", "scope:demo"],
+  "tags": [
+    "type:app",
+    "scope:demo"
+  ],
   "generators": {
     "@schematics/angular:component": {
       "style": "scss"
@@ -17,14 +20,18 @@
         "outputPath": "dist/apps/popper-test",
         "baseHref": "/mde-popover/",
         "index": "apps/popper-test/src/index.html",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "apps/popper-test/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
           "apps/popper-test/src/favicon.ico",
           "apps/popper-test/src/assets"
         ],
-        "styles": ["apps/popper-test/src/styles.scss"],
+        "styles": [
+          "apps/popper-test/src/styles.scss"
+        ],
         "scripts": [],
         "browser": "apps/popper-test/src/main.ts"
       },
@@ -82,7 +89,9 @@
       },
       "dependsOn": [
         {
-          "projects": ["@muntazir/material-extended"],
+          "projects": [
+            "@muntazir/material-extended"
+          ],
           "target": "build"
         }
       ]

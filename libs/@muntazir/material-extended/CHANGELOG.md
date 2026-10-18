@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Nx Release prepends generated notes for later versions above this hand-written history. The 5.x–9.x entries were reconstructed from git history and the package manifests on the `5.x`–`9.x` branches. This repository has no git tags for those lines, so the notes only include what those commits and manifests record.
 
+## [11.0.0] - 2026-10-17
+
+Angular 22 support. The workspace moves to Nx 23.3, Angular and Angular Material/CDK 22.1, and TypeScript 6.0. Node.js 22.22.3 or later (or 24.15+) is required, matching Angular 22. Peer dependencies on `@angular/cdk`, `@angular/common`, and `@angular/core` are `^22.0.0`. Maintenance for Angular 21 continues on the `10.x` branch.
+
+### Breaking
+
+- Requires Angular 22 (`@angular/cdk`, `@angular/common`, `@angular/core` `^22.0.0`).
+- The deprecated `transformPopover` animation trigger is removed. `@angular/animations` is no longer needed. The popover animates with Angular's built-in `animate.enter`/`animate.leave` and CSS, and `mdePopoverDisableAnimation` still turns it off.
+
+### Changed
+
+- CDK 22 overlays still render in the browser top layer by default. The popover keeps the 10.0.0 behaviour: it opts out of the top layer only when `mdePopoverCloseOnClickTrigger` is `false` with a click trigger and backdrop close, so the trigger stays clickable above the backdrop.
+- The package description no longer refers to the Angular CLI 20 scaffold.
+- The demo app builds with `@angular/build` instead of the deprecated webpack-based `@angular-devkit/build-angular`. Karma and Jasmine are removed in favour of Vitest.
+- Demo components that hold mutable state opt into `ChangeDetectionStrategy.Eager` because Angular 22 makes `OnPush` the default.
+
+### Fixed
+
+- A popover without `mdePopoverOverlapTrigger` no longer flips to the other side of the trigger every time a new overlay is built for it, for example when several triggers share the popover or a trigger is re-created inside `@if`/`@for`. The rendered (fallback) position was written back over the requested `mdePopoverPositionX`/`mdePopoverPositionY`, so the next overlay started from the flipped position. With `mdePopoverOffsetY` the panel then also landed on top of the trigger.
+- When the panel falls back to the other side of the trigger (no room on the requested side), `mdePopoverOffsetY`/`mdePopoverOffsetX` are mirrored for that fallback, so a gap stays a gap instead of pushing the flipped panel over the trigger.
+- Each time a popover opens, its arrow styles and position classes start from the side the trigger asks for. They used to keep the side where the popover last rendered (for another trigger sharing it, or after a flip). Without overlap the arrow changes the panel height, and the overlay measures the panel before it reports a position. So a panel could flip with room to spare, or overflow the viewport by the arrow size.
+- A popover opened by hover no longer moves focus onto its trigger when it closes. Only a keyboard open restores focus. With several triggers sharing one popover, moving the pointer to the next trigger used to focus the previous one.
+
 ## [10.0.0] - 2026-10-15
 
 Angular 21 support landed in [PR #13](https://github.com/Muntazir86/mde-popover/pull/13). The workspace uses Nx 22.5.4. Node.js 22.14 or later is required. Peer dependencies on `@angular/cdk`, `@angular/common`, and `@angular/core` are `^21.0.0`.

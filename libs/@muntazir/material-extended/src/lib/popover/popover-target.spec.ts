@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -8,6 +8,7 @@ import { MdePopoverTarget } from './popover-target';
 @Component({
   selector: 'mde-spec-target-host',
   imports: [MdePopoverTarget],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <mde-popover-target class="element-target" #element="mdePopoverTarget">
       Element

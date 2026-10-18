@@ -1,0 +1,117 @@
+<div class="list-page">
+  <header class="list-header">
+    <h2 data-testid="list-heading">Product list</h2>
+    <p>
+      Hover a row to see its details. Every row uses the same <code>mde-popover</code>; filtering,
+      shuffling, or changing the position re-creates the row triggers.
+    </p>
+  </header>
+
+  <mat-card class="toolbar" appearance="outlined">
+    <mat-card-content>
+      <mat-chip-listbox
+        aria-label="Category"
+        data-testid="list-filter"
+        [ngModel]="category"
+        (ngModelChange)="setCategory($event)"
+      >
+        <mat-chip-option value="All" data-testid="list-filter-All">All</mat-chip-option>
+        @for (c of categories; track c) {
+          <mat-chip-option [value]="c" [attr.data-testid]="'list-filter-' + c">{{ c }}</mat-chip-option>
+        }
+      </mat-chip-listbox>
+
+      <div class="toolbar-row">
+        <mat-button-toggle-group
+          aria-label="Popover side"
+          hideSingleSelectionIndicator
+          [(ngModel)]="positionY"
+          data-testid="list-position"
+        >
+          <mat-button-toggle value="below" data-testid="list-position-below">Below</mat-button-toggle>
+          <mat-button-toggle value="above" data-testid="list-position-above">Above</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <mat-form-field subscriptSizing="dynamic" class="gap-field">
+          <mat-label>Gap</mat-label>
+          <input matInput type="number" min="0" max="48" [(ngModel)]="gap" data-testid="list-gap" />
+          <span matTextSuffix>px</span>
+        </mat-form-field>
+
+        <code class="binding" data-testid="list-binding">
+          mdePopoverPositionY="{{ positionY }}" [mdePopoverOffsetY]="{{ offsetY }}"
+        </code>
+
+        <span class="spacer"></span>
+        <button mat-stroked-button (click)="shuffle()" data-testid="list-shuffle">Shuffle</button>
+        <button mat-button (click)="reset()" data-testid="list-reset">Reset</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <p class="count" data-testid="list-count">{{ visible.length }} of {{ products.length }} products</p>
+
+  <!-- A new layout key re-creates the whole list, so every row trigger builds a fresh overlay. -->
+  @for (key of [layoutKey]; track key) {
+  <ul class="rows" role="list">
+    @for (item of visible; track item.id) {
+      <li
+        class="row"
+        role="listitem"
+        tabindex="0"
+        [attr.data-testid]="'list-item-' + item.id"
+        [mdePopoverTriggerFor]="details"
+        (mouseenter)="active = item"
+        (focus)="active = item"
+      >
+        <span class="avatar" [style.background]="item.color" aria-hidden="true">{{ item.name.charAt(0) }}</span>
+        <span class="name">
+          <strong>{{ item.name }}</strong>
+          <small>{{ item.category }}</small>
+        </span>
+        <span class="rating" [attr.aria-label]="item.rating + ' out of 5'">{{ stars(item.rating) }}</span>
+        <span class="price">{{ '$' + item.price.toFixed(2) }}</span>
+        <span class="stock" [class.out]="item.stock === 0">
+          {{ item.stock === 0 ? 'Out of stock' : item.stock + ' in stock' }}
+        </span>
+      </li>
+    } @empty {
+      <li class="empty">No products in this category.</li>
+    }
+  </ul>
+  }
+</div>
+
+<!-- One popover shared by every row. -->
+<mde-popover
+  #details="mdePopover"
+  mdePopoverTriggerOn="hover"
+  mdePopoverPositionX="center"
+  [mdePopoverPositionY]="positionY"
+  [mdePopoverOffsetY]="offsetY"
+  [mdePopoverOverlapTrigger]="false"
+  [mdePopoverEnterDelay]="enterDelay"
+  [mdePopoverLeaveDelay]="leaveDelay"
+  [mdeFocusTrapEnabled]="false"
+  mdePopoverArrowColor="rgba(0, 0, 0, 0.12)"
+>
+  @if (active) {
+    <mat-card class="details" appearance="outlined" data-testid="list-popover-content">
+      <mat-card-content>
+        <div class="details-head">
+          <span class="avatar" [style.background]="active.color" aria-hidden="true">{{ active.name.charAt(0) }}</span>
+          <div>
+            <strong data-testid="list-popover-name">{{ active.name }}</strong>
+            <small>{{ active.category }} · {{ active.sku }}</small>
+          </div>
+        </div>
+        <p>{{ active.blurb }}</p>
+        <dl>
+          <dt>Price</dt><dd data-testid="list-popover-price">{{ '$' + active.price.toFixed(2) }}</dd>
+          <dt>Rating</dt><dd>{{ active.rating.toFixed(1) }} / 5</dd>
+          <dt>Stock</dt><dd>{{ active.stock === 0 ? 'Out of stock' : active.stock }}</dd>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+  }
+</mde-popover>

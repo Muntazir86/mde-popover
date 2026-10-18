@@ -51,6 +51,8 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
   /** Settings for popover, view setters and getters for more detail */
   private _positionX: MdePopoverPositionX = 'after';
   private _positionY: MdePopoverPositionY = 'below';
+  private _requestedPositionX: MdePopoverPositionX = 'after';
+  private _requestedPositionY: MdePopoverPositionY = 'below';
   private _triggerEvent: MdePopoverTriggerEvent = 'hover';
   private _scrollStrategy: MdePopoverScrollStrategy = 'reposition';
   private _enterDelay = 200;
@@ -102,6 +104,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
       throwMdePopoverInvalidPositionX();
     }
     this._positionX = value;
+    this._requestedPositionX = value;
     this.setPositionClasses();
   }
 
@@ -115,7 +118,30 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
       throwMdePopoverInvalidPositionY();
     }
     this._positionY = value;
+    this._requestedPositionY = value;
     this.setPositionClasses();
+  }
+
+  /**
+   * The position set through the inputs. `positionX`/`positionY` follow the position the overlay
+   * actually rendered (a fallback, or the flipped arrow side without overlap), so a trigger builds
+   * a new overlay from these values instead.
+   * @docs-private
+   */
+  get _requestedPosition(): { x: MdePopoverPositionX; y: MdePopoverPositionY } {
+    return { x: this._requestedPositionX, y: this._requestedPositionY };
+  }
+
+  /**
+   * Records the position the overlay rendered and updates the arrow styles and classes, without
+   * changing the requested position.
+   * @docs-private
+   */
+  _setRenderedPosition(x: MdePopoverPositionX, y: MdePopoverPositionY): void {
+    this._positionX = x;
+    this._positionY = y;
+    this.setCurrentStyles();
+    this.setPositionClasses(x, y);
   }
 
   /** Popover trigger event */

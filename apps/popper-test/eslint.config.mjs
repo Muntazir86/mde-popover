@@ -30,4 +30,11 @@ export default [
     files: ['**/*.html'],
     rules: {},
   },
+  {
+    // Test hosts mutate fields and call detectChanges(); keep them on Eager change detection.
+    files: ['**/*.spec.ts'],
+    rules: {
+      '@angular-eslint/prefer-on-push-component-change-detection': 'off',
+    },
+  },
 ];
