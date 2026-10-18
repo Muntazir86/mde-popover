@@ -5,7 +5,7 @@ import {
   Overlay,
   OverlayRef,
 } from '@angular/cdk/overlay';
-import { ApplicationRef, ElementRef, Component } from '@angular/core';
+import { ApplicationRef, ElementRef, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { EMPTY, Subject } from 'rxjs';
@@ -126,7 +126,6 @@ class TriggerHost {
 @Component({
   selector: 'mde-spec-shared-popover-host',
   imports: [MdePopover, MdePopoverTrigger],
-  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <mde-popover
       #popover="mdePopover"
@@ -138,13 +137,13 @@ class TriggerHost {
       <span>Shared</span>
     </mde-popover>
     <button type="button" class="first" [mdePopoverTriggerFor]="popover">First</button>
-    @if (showSecond) {
+    @if (showSecond()) {
       <button type="button" class="second" [mdePopoverTriggerFor]="popover">Second</button>
     }
   `,
 })
 class SharedPopoverHost {
-  showSecond = true;
+  readonly showSecond = signal(true);
 }
 
 @Component({
@@ -1283,9 +1282,9 @@ describe('MdePopoverTrigger', () => {
         expect(below(strategyFor(second))).toBe('bottom/top');
         second.closePopover();
 
-        shared.componentInstance.showSecond = false;
+        shared.componentInstance.showSecond.set(false);
         shared.detectChanges();
-        shared.componentInstance.showSecond = true;
+        shared.componentInstance.showSecond.set(true);
         shared.detectChanges();
       }
       shared.destroy();

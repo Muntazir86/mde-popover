@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MdePopoverModule, MdePopoverPositionY } from '@muntazir/material-extended';
 import { MatButton } from '@angular/material/button';
@@ -70,9 +70,6 @@ export const PRODUCTS: Product[] = NAMES.map(([name, category, blurb], i) => ({
   selector: 'app-page-examples-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss'],
-  // Mutable demo state; keep the pre-v22 default until it moves to signals.
-  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     FormsModule,
     MdePopoverModule,
