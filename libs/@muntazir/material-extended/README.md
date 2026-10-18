@@ -5,7 +5,9 @@
 #### Links
 
 [Popover Demo](https://muntazir86.github.io/mde-popover/) | [StackBlitz Template](https://stackblitz.com/edit/stackblitz-starters-6n5dqd) |
-[Documentation](https://github.com/Muntazir86/mde-popover/blob/master/projects/muntazir/material-extended/src/lib/popover/popover.md) | [npm](https://www.npmjs.com/package/@muntazir86/material-extended)
+[Documentation](https://github.com/Muntazir86/mde-popover/blob/9.x/libs/@muntazir/material-extended/src/lib/popover/popover.md) | [Changelog](https://github.com/Muntazir86/mde-popover/blob/9.x/libs/@muntazir/material-extended/CHANGELOG.md) | [npm](https://www.npmjs.com/package/@muntazir86/material-extended)
+
+This README is for the 9.x line (Angular 20). Commit messages and the manual release flow are in [CONTRIBUTING.md](https://github.com/Muntazir86/mde-popover/blob/9.x/CONTRIBUTING.md).
 
 ### Project status
 
@@ -20,6 +22,8 @@ If you'd like to contribute please create an issue or pull request.
 
 | Angular Version | Package Compatibility |
 | --------------- | --------------------- |
+| 22.x            | 11.x                  |
+| 21.x            | 10.x                  |
 | 20.x            | 9.x                   |
 | 19.x            | 8.x                   |
 | 18.x            | 7.x                   |
@@ -44,25 +48,39 @@ If you'd like to contribute please create an issue or pull request.
 
 ### Installation
 
-Install npm package using:
+Install the 9.x package and the Angular CDK for Angular 20:
 
-`npm install @muntazir86/material-extended`
+```bash
+npm install @muntazir86/material-extended@^9 @angular/cdk@^20
+```
 
-Install required packages @angular/cdk
-
-`yarn add @angular/cdk`
-or
-`npm install @angular/cdk`
+`@angular/animations` is also a peer dependency (npm 7 and later installs peers automatically). It is only used by the deprecated `transformPopover` export; the popover itself animates with `animate.enter`/`animate.leave` and needs no animations provider.
 
 ### Initial setup
 
 The CDK overlays depend on a small set of structural styles to work correctly. If you're using Angular Material, these styles have been included together with the theme, otherwise if you're using the CDK on its own, you'll have to include the styles yourself. You can do so by importing the prebuilt styles in your global stylesheet:
 
+```css
 @import '@angular/cdk/overlay-prebuilt.css';
+```
 
 ### Import module
 
-app.module.ts
+Import `MdePopoverModule` in a standalone component:
+
+```typescript
+import { Component } from '@angular/core';
+import { MdePopoverModule } from '@muntazir86/material-extended';
+
+@Component({
+  selector: 'app-root',
+  imports: [MdePopoverModule],
+  templateUrl: './app.component.html',
+})
+export class AppComponent {}
+```
+
+or in an `NgModule`:
 
 ```typescript
 import { BrowserModule } from '@angular/platform-browser';
@@ -74,7 +92,6 @@ import { MdePopoverModule } from '@muntazir86/material-extended';
 @NgModule({
   declarations: [AppComponent],
   imports: [BrowserModule, MdePopoverModule],
-  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
@@ -82,19 +99,19 @@ export class AppModule {}
 
 ### Usage
 
-`<mde-popover>` is a floating panel containing html content.
+The `mde-popover` element is a floating panel containing html content.
 
-By itself, the `<mde-popover>` element does not render anything. The popover is attached to and opened
-via application of the `mdePopoverTriggerFor` directive:
+By itself, the `mde-popover` element does not render anything. The popover is attached to and opened
+via application of the `mdePopoverTriggerFor` directive. The example below uses Angular Material buttons and icons (`MatButtonModule`, `MatIconModule`); any content works:
 
 ```html
 <mde-popover #appPopover="mdePopover">
-  <button md-button>Settings</button>
-  <button md-button>Help</button>
+  <button mat-button>Settings</button>
+  <button mat-button>Help</button>
 </mde-popover>
 
-<button md-button [mdePopoverTriggerFor]="appPopover" mdePopoverTriggerOn="click">
-  <md-icon>more_vert</md-icon>
+<button mat-icon-button [mdePopoverTriggerFor]="appPopover" mdePopoverTriggerOn="click">
+  <mat-icon>more_vert</mat-icon>
 </button>
 ```
 
@@ -113,6 +130,7 @@ via application of the `mdePopoverTriggerFor` directive:
 | @Input('mdePopoverPositionX') positionX                              | Position of the popover in the X axis. Type: string, Values: 'start' \|\| 'end' \|\| 'before' \|\| 'after' \|\| 'center', Default: 'after'.                                                                                          |
 | @Input('mdePopoverPositionY') positionY                              | Position of the popover in the Y axis. Type: string, Values: 'start' \|\| 'end' \|\| 'above' \|\| 'below' \|\| 'center', Default: 'below'                                                                                            |
 | @Input('mdePopoverTriggerOn') triggerEvent                           | Event for triggering popover 'click', 'hover' and 'none'. Default: hover                                                                                                                                                             |
+| @Input('mdePopoverScrollStrategy') scrollStrategy                    | How the popover reacts to scrolling. Type: string, Values: 'noop' \|\| 'close' \|\| 'block' \|\| 'reposition', Default: 'reposition'                                                                                                 |
 | @Input('mdePopoverEnterDelay') enterDelay                            | Delay for popover before enters, Type: number, Default: 200                                                                                                                                                                          |
 | @Input('mdePopoverLeaveDelay') leaveDelay                            | Delay for popover before leaves, Type: number, Default: 200                                                                                                                                                                          |
 | @Input('mdePopoverOverlapTrigger') overlapTrigger                    | Whether the popover should overlap its trigger. Type: boolean, Default: true                                                                                                                                                         |
@@ -120,9 +138,10 @@ via application of the `mdePopoverTriggerFor` directive:
 | @Input('mdePopoverOffsetY') targetOffsetY                            | Offset position of the popover from target in the Y axis. Type: number, Default: 0                                                                                                                                                   |
 | @Input('mdePopoverArrowOffsetX') arrowOffsetX                        | Offset position of the popover arrow from the X axis. Type: number, Default: 0                                                                                                                                                       |
 | @Input('mdePopoverArrowOffsetY') arrowOffsetY                        | Offset position of the popover arrow from the Y axis. Type: number, Default: 0                                                                                                                                                       |
-| @Input('mdePopoverArrowWidth') arrowWidth                            | Arrow width in pixels.                                                                                                                                                                                                               |
+| @Input('mdePopoverArrowWidth') arrowWidth                            | Arrow width in pixels. Type: number, Default: 8                                                                                                                                                                                      |
 | @Input('mdePopoverArrowColor') arrowColor                            | Arrow color, accepts CSS color values. Default: rgba(0, 0, 0, 0.12)                                                                                                                                                                  |
 | @Input('mdePopoverCloseOnClick') closeOnClick                        | Whether the popover should close on click. Type: boolean, Default: true                                                                                                                                                              |
+| @Input('mdePopoverDisableAnimation') disableAnimation                | Disables the enter and leave animations. Type: boolean, Default: false                                                                                                                                                               |
 | @Input('mdeFocusTrapEnabled') focusTrapEnabled                       | Whether the popover should focus trap. Type: boolean, Default: true                                                                                                                                                                  |
 | @Input('mdeFocusTrapAutoCaptureEnabled') focusTrapAutoCaptureEnabled | Whether the popover should focus trap auto capture focus. Type: boolean, Default: true                                                                                                                                               |
 | @Input('class') classList                                            | This method takes classes set on the host mde-popover element and applies them on the popover template that displays in the overlay container. Otherwise, it's difficult to style the containing popover from outside the component. |
@@ -161,7 +180,7 @@ This directive is intended to be used in conjunction with an mde-popover tag. It
 | @Input('mdePopoverOffsetX') targetOffsetX                     | Offset position of the popover from target in the X axis. Type: number, Default: 0                              |
 | @Input('mdePopoverOffsetY') targetOffsetY                     | Offset position of the popover from target in the Y axis. Type: number, Default: 0                              |
 | @Input('mdePopoverArrowOffsetX') arrowOffsetX                 | Offset position of the popover arrow from the X axis. Type: number, Default: 0                                  |
-| @Input('mdePopoverArrowOffsetY') arrowOffsetX                 | Offset position of the popover arrow from the Y axis. Type: number, Default: 0                                  |
+| @Input('mdePopoverArrowOffsetY') arrowOffsetY                 | Offset position of the popover arrow from the Y axis. Type: number, Default: 0                                  |
 | @Input('mdePopoverArrowWidth') arrowWidth                     | Arrow width in pixels. Type: number, Default: 8                                                                 |
 | @Input('mdePopoverArrowColor') arrowColor                     | Arrow color, accepts CSS color values. Default: rgba(0, 0, 0, 0.12)                                             |
 | @Input('mdePopoverCloseOnClick') closeOnClick                 | Whether the popover should close on click. Type: boolean, Default: true.                                        |
@@ -187,8 +206,6 @@ Removes the popover from the DOM.
 ### Issues
 
 Please report bugs and issues [here](https://github.com/Muntazir86/mde-popover/issues).
-
-###
 
 ### License
 

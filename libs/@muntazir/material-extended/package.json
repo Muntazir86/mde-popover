@@ -2,6 +2,7 @@
   "name": "@muntazir86/material-extended",
   "version": "9.0.1",
   "peerDependencies": {
+    "@angular/animations": "^20.3.6",
     "@angular/cdk": "^20.2.9",
     "@angular/common": "^20.3.6",
     "@angular/core": "^20.3.6"
@@ -10,7 +11,7 @@
     "tslib": "^2.3.0"
   },
   "sideEffects": false,
-  "description": "This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 20.3.6.",
+  "description": "Material-styled popover directive for Angular 20, built on the Angular CDK overlay.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
