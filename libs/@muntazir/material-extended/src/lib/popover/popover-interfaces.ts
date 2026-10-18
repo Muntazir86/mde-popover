@@ -29,6 +29,10 @@ export interface MdePopoverPanel {
   zone: NgZone;
   setPositionClasses: (x: MdePopoverPositionX, y: MdePopoverPositionY) => void;
   _emitCloseEvent: () => void;
+  /** Position requested through the inputs; used to build new overlays. */
+  _requestedPosition?: { x: MdePopoverPositionX; y: MdePopoverPositionY };
+  /** Records the rendered position without changing the requested one. */
+  _setRenderedPosition?: (x: MdePopoverPositionX, y: MdePopoverPositionY) => void;
 }
 
 export interface MdePopoverConfig {

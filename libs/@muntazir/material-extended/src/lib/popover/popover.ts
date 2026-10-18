@@ -50,6 +50,8 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
   /** Settings for popover, view setters and getters for more detail */
   private _positionX: MdePopoverPositionX = 'after';
   private _positionY: MdePopoverPositionY = 'below';
+  private _requestedPositionX: MdePopoverPositionX = 'after';
+  private _requestedPositionY: MdePopoverPositionY = 'below';
   private _triggerEvent: MdePopoverTriggerEvent = 'hover';
   private _scrollStrategy: MdePopoverScrollStrategy = 'reposition';
   private _enterDelay = 200;
@@ -101,6 +103,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
       throwMdePopoverInvalidPositionX();
     }
     this._positionX = value;
+    this._requestedPositionX = value;
     this.setPositionClasses();
   }
 
@@ -114,7 +117,30 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
       throwMdePopoverInvalidPositionY();
     }
     this._positionY = value;
+    this._requestedPositionY = value;
     this.setPositionClasses();
+  }
+
+  /**
+   * The position set through the inputs. `positionX`/`positionY` follow the position the overlay
+   * actually rendered (a fallback, or the flipped arrow side without overlap), so a trigger builds
+   * a new overlay from these values instead.
+   * @docs-private
+   */
+  get _requestedPosition(): { x: MdePopoverPositionX; y: MdePopoverPositionY } {
+    return { x: this._requestedPositionX, y: this._requestedPositionY };
+  }
+
+  /**
+   * Records the position the overlay rendered and updates the arrow styles and classes, without
+   * changing the requested position.
+   * @docs-private
+   */
+  _setRenderedPosition(x: MdePopoverPositionX, y: MdePopoverPositionY): void {
+    this._positionX = x;
+    this._positionY = y;
+    this.setCurrentStyles();
+    this.setPositionClasses(x, y);
   }
 
   /** Popover trigger event */
@@ -159,7 +185,8 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
     return this._overlapTrigger;
   }
   set overlapTrigger(value: boolean) {
-    this._overlapTrigger = value;
+    // Attribute bindings pass the string "false", which must not stay truthy.
+    this._overlapTrigger = coerceBooleanProperty(value);
   }
 
   /** Popover target offset x */
@@ -264,6 +291,9 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
     this._focusTrapAutoCaptureEnabled = coerceBooleanProperty(value);
   }
 
+  /** Classes last applied through the `class` / `classList` inputs. */
+  private _panelClass = '';
+
   /**
    * This method takes classes set on the host md-popover element and applies them on the
    * popover template that displays in the overlay container.  Otherwise, it's difficult
@@ -272,6 +302,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
    */
   @Input('class')
   set panelClass(classes: string) {
+    this._panelClass = classes ?? '';
     if (classes && classes.length) {
       this._classList = classes
         .split(' ')
@@ -293,7 +324,7 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
    */
   @Input()
   get classList(): string {
-    return this.panelClass;
+    return this._panelClass;
   }
   set classList(classes: string) {
     this.panelClass = classes;
@@ -329,6 +360,10 @@ export class MdePopover implements MdePopoverPanel, OnDestroy {
    * trigger will close the popover.
    */
   _emitCloseEvent(): void {
+    // Hovering the panel sets closeDisabled. A click (or Esc) can dismiss the
+    // panel before mouseleave runs, and the flag has to be cleared or the next
+    // hover open will ignore the trigger's leave timer.
+    this.closeDisabled = false;
     this.close.emit();
   }
 
