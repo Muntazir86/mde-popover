@@ -26,3 +26,5 @@ Bug fixes backported from 10.0.0 and 11.0.0. No API or behaviour changes beyond 
 - The `classList` getter returns the panel class list.
 - The stray `console.log` in the `noop` scroll strategy is removed.
 - Position and trigger-event types are re-exported as types only.
+- `@angular/animations` is now listed as a peer dependency. The package imports it for the deprecated `transformPopover` trigger, so an app without it could fail to build.
+- The published package now includes this changelog, and the README links, version table and examples are updated for 9.x.
