@@ -31,7 +31,7 @@ There is no git hook. `commitlint` only checks `HEAD~1..HEAD`, so older non-conv
 
 - `.github/workflows/node.js.yml` (Node.js CI) runs lint, library and demo unit tests, all builds, and e2e on pushes to any branch and on pull requests into any branch. Pull requests from branches in this repository reuse the push run for the same commit (their `pull_request` jobs are skipped); pull requests from forks run the jobs.
 - `.github/workflows/deploy.yml` publishes the demo to `gh-pages` only after Node.js CI passes for a push to `master`. It builds the demo and pushes `dist/apps/popper-test/browser` (plus `404.html` and `.nojekyll`) to the `gh-pages` branch with git.
-- `.github/workflows/fossa.yml` (FOSSA) runs `fossa analyze` and `fossa test` on pushes to any branch and on pull requests, and fails on FOSSA policy issues. It needs the `FOSSA_API_KEY` repository secret; without it (for example on fork pull requests) the scan is skipped. `.fossa.yml` sets the project ID and leaves build output out; devDependencies are not reported.
+- FOSSA scans the repository through its GitHub integration (project `git+github.com/Muntazir86/mde-popover`). It analyzes each pushed commit and posts License Compliance, Security Analysis and Dependency Quality checks on pull requests. There is no FOSSA workflow or API key in this repository; policies and ignores are managed in the FOSSA web app.
 - The Node.js version comes from `.nvmrc` (`22.14.0` on `master` and `10.x`, `22.23.3` on `11.x`). Change Node only there. The workflow files are identical on every branch, so merging between `master`, `10.x`, and `11.x` never changes them; only `.nvmrc`, the package versions, and the lock file differ.
 
 ## Releasing
