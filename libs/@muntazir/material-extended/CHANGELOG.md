@@ -18,7 +18,8 @@ Nx Release prepends generated notes for later versions above this hand-written h
 - The workspace's dependency audit is clean (`npm audit`: 32 advisories, 5 critical, 14 high, 13 moderate, all fixed). None of them were in the published package, whose only runtime dependency is `tslib`, with `@angular/*` as peers.
   - Angular framework, CLI and build tooling go from 22.1 to 22.2.3, and ng-packagr from 22.1.1 to 22.2.4. This fixes the `@angular/router` SSR denial of service, `piscina` prototype pollution, and the `@modelcontextprotocol/sdk` advisory in `@angular/cli`. The unused webpack-based `@angular-devkit/build-angular` tree (`webpack-dev-server`, `sockjs`/`uuid`, `karma`, `http-proxy-middleware`) is no longer installed.
   - `angular-cli-ghpages` is removed. It was a runtime dependency of the workspace and pulled in `gh-pages`, `ajv`, `picomatch`, `chokidar` and `braces`; `braces` has no patched release. The demo deploy workflow now pushes the build to `gh-pages` with git.
-  - `undici` (used by `nx` 23.3.0, the latest 23.x) is overridden to `^7.30.1`.
+  - `undici` (used by `nx` 23.3.0, the latest 23.x) is overridden to `^7.30.1` for `nx` only, so `jsdom` keeps its own `undici` 8.
+- Test tooling for FOSSA dependency quality: `jsdom` goes from 27 to 30.1, and `vitest` and `@vitest/coverage-v8` from 4.1 to 5.0. This replaces the outdated `@asamuzakjp/css-color`, `@asamuzakjp/dom-selector` and `tinybench`. The remaining flagged packages are pinned by `nx` 23.3, ESLint 9, Babel, PostCSS, `less`, `http-server` and `sass-embedded`.
 - The READMEs show the FOSSA license and security badges for `Muntazir86/mde-popover`.
 
 ## [11.0.0] - 2026-10-18
