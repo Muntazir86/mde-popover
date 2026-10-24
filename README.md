@@ -1,6 +1,6 @@
 # Angular Popover
 
-![npm (scoped)](https://img.shields.io/npm/v/%40muntazir86/material-extended?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40muntazir86%2Fmaterial-extended)
+![npm (scoped)](https://img.shields.io/npm/v/%40muntazir86/material-extended?link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40muntazir86%2Fmaterial-extended) [![FOSSA license status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMuntazir86%2Fmde-popover.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FMuntazir86%2Fmde-popover?ref=badge_shield&issueType=license) [![FOSSA security status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMuntazir86%2Fmde-popover.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2FMuntazir86%2Fmde-popover?ref=badge_shield&issueType=security)
 
 #### Links
 

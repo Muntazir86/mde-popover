@@ -13,6 +13,17 @@ Nx Release prepends generated notes for later versions above this hand-written h
 - The package is licensed under ISC, and a LICENSE file now ships in the npm package and sits at the repository root. It keeps the MIT notice of the original Angular Popover by Joe Jordan Brown. The READMEs say ISC and no longer show a FOSSA badge for the upstream repository.
 - README: Documentation, Changelog and CONTRIBUTING links point at the `master` branch, the install command targets 11.x and Angular 22, examples use `mat-button`/`mat-icon` and show a standalone import, and the API tables list `mdePopoverScrollStrategy` and `mdePopoverDisableAnimation`.
 
+### Security
+
+- The workspace's dependency audit is clean (`npm audit`: 32 advisories, 5 critical, 14 high, 13 moderate, all fixed). None of them were in the published package, whose only runtime dependency is `tslib`, with `@angular/*` as peers.
+  - Angular framework, CLI and build tooling go from 22.1 to 22.2.3, and ng-packagr from 22.1.1 to 22.2.4. This fixes the `@angular/router` SSR denial of service, `piscina` prototype pollution, and the `@modelcontextprotocol/sdk` advisory in `@angular/cli`. The unused webpack-based `@angular-devkit/build-angular` tree (`webpack-dev-server`, `sockjs`/`uuid`, `karma`, `http-proxy-middleware`) is no longer installed.
+  - `angular-cli-ghpages` is removed. It was a runtime dependency of the workspace and pulled in `gh-pages`, `ajv`, `picomatch`, `chokidar` and `braces`; `braces` has no patched release. The demo deploy workflow now pushes the build to `gh-pages` with git.
+  - `undici` (used by `nx` 23.3.0, the latest 23.x) is overridden to `^7.30.1` for `nx` only, so `jsdom` keeps its own `undici` 8.
+- Test tooling for FOSSA dependency quality: `jsdom` goes from 27 to 30.1, and `vitest` and `@vitest/coverage-v8` from 4.1 to 5.0. This replaces the outdated `@asamuzakjp/css-color`, `@asamuzakjp/dom-selector` and `tinybench`.
+- ESLint goes from 9.39 to 10.13, with `@eslint/js` 10 added as a direct devDependency because ESLint 10 no longer installs it and `@nx/eslint-plugin` needs it. The flat config needed no changes, and lint reports no new problems. This also replaces the outdated `file-entry-cache` and `globals`. The remaining flagged packages are pinned by `nx` 23.3, Babel, PostCSS, `less`, `http-server`, `cross-spawn` and `sass-embedded`, or by ESLint 10 itself (`find-up` 5).
+- The unused `postcss-url` devDependency is removed. It was the last user of the outdated `minimatch` 3, `brace-expansion` 1 and `balanced-match` 1.
+- The READMEs show the FOSSA license and security badges for `Muntazir86/mde-popover`.
+
 ## [11.0.0] - 2026-10-18
 
 Angular 22 support. The workspace moves to Nx 23.3, Angular and Angular Material/CDK 22.1, and TypeScript 6.0. Node.js 22.22.3 or later (or 24.15+) is required, matching Angular 22. Peer dependencies on `@angular/cdk`, `@angular/common`, and `@angular/core` are `^22.0.0`. Maintenance for Angular 21 continues on the `10.x` branch.
