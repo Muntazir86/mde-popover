@@ -70,6 +70,10 @@
     "vitest": "^5.0.5"
   },
   "overrides": {
+    "ajv": {
+      "fast-uri": "3.1.9"
+    },
+    "vite": "8.3.5",
     "nx": {
       "undici": "^7.30.1"
     }
