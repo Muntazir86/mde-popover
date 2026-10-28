@@ -164,6 +164,9 @@ test.describe('builder playground', () => {
     const trigger = page.getByTestId('builder-trigger');
     const toggle = page.getByTestId('builder-close-on-click-trigger').getByRole('switch');
     const clickTrigger = async () => {
+      // Coordinate clicks do not scroll. After the toggle, the rebuilt trigger
+      // can sit just above a 720px viewport, so the click misses it.
+      await trigger.scrollIntoViewIfNeeded();
       const b = (await trigger.boundingBox())!;
       await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
     };
