@@ -101,7 +101,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SPECIFIER: ${{ steps.resolve.outputs.specifier }}
-        run: npx nx release $SPECIFIER --skip-publish --yes
+        run: npx nx release $SPECIFIER --skip-publish
       - name: Keep the GitHub latest release on the newest major (bump)
         # Nx marks the release it creates as latest; for an older major, move the
         # badge back to the release of the npm "latest" version.
