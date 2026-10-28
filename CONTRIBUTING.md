@@ -44,7 +44,7 @@ Generated notes are prepended to `libs/@muntazir/material-extended/CHANGELOG.md`
 
 Protected branches only accept changes through a pull request, so shipping a bump is two runs:
 
-1. `patch`, `minor`, or `conventional` runs `nx release --skip-publish` (do not combine that with `--yes`; Nx 23 treats them as mutually exclusive). It bumps both manifests, prepends the changelog, and commits on a new branch `release/<branch>-v<version>`. The workflow opens a pull request into the branch you selected and stops. It does not push that branch, tag, create a GitHub release, or stage on npm.
+1. `patch`, `minor`, or `conventional` runs `nx release --skip-publish` (do not combine that with `--yes`; Nx treats them as mutually exclusive). It bumps both manifests, prepends the changelog, and commits on a new branch `release/<branch>-v<version>`. The workflow opens a pull request into the branch you selected and stops. It does not push that branch, tag, create a GitHub release, or stage on npm.
 2. Merge the pull request, then run the workflow again on the same branch with `package-version`. That tags `v{version}`, creates the GitHub release from the changelog section, builds, and stages the package. Approve the staged version with 2FA.
 
 Run a release from the branch that owns the major: `master` for the major in its `package.json`, or a maintenance branch such as `10.x` or `11.x` for its own major. The Release workflow file is the same on every branch. A branch named `N.x` can only release major `N`.
