@@ -39,6 +39,8 @@ Protected branches only accept changes through a pull request, so shipping a bum
 1. `patch`, `minor`, or `conventional` runs `nx release --skip-publish` (do not combine that with `--yes`; Nx treats them as mutually exclusive). It bumps both manifests, prepends the changelog, and commits on a new branch `release/<branch>-v<version>`. The workflow opens a pull request into the branch you selected and stops. It does not push that branch, tag, create a GitHub release, or stage on npm.
 2. Merge the pull request, then run the workflow again on the same branch with `package-version`. That tags `v{version}`, creates the GitHub release from the changelog section, builds, and stages the package. Approve the staged version with 2FA.
 
+The workflow opens that pull request with `GITHUB_TOKEN`. That works only if the repository allows Actions to create pull requests (Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests").
+
 On 9.x the Nx config uses the Nx 21 keys `releaseTagPattern` and `releaseTagPatternCheckAllBranchesWhen` (the other branches use the newer `releaseTag` object); the behaviour is the same. `run-bump.mjs` only changes `release.git.tag` and `changelog.projectChangelogs.createRelease` for the bump command, so that difference does not matter.
 
 9.x has no `v9.*` git tag yet (9.0.0 was published without one), so **release 9.0.1 with mode `package-version`**. It creates the `v9.0.1` tag. After that tag exists, `patch`, `minor`, and `conventional` open a release pull request. Before that tag exists, Nx falls back to the newest tag on any branch (`v10.0.0`), and the guard refuses the bump because it leaves major 9.
