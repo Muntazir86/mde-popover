@@ -6,9 +6,11 @@
 //
 // Releases can run from any branch: master for its current major, and maintenance branches such
 // as 10.x for older majors. package-version releases exactly the version in the library
-// package.json (first release of a major). The other modes let Nx Release bump, but the result
-// must stay in the branch's package.json major, so a breaking-change commit can never move a
-// branch to the next major. A branch named N.x may only release major N.
+// package.json (first release of a major, or the run after a bump pull request is merged).
+// patch, minor, and conventional let Nx Release bump, but the result must stay in the branch's
+// package.json major, so a breaking-change commit can never move a branch to the next major.
+// Those modes only choose the version here; the workflow commits the bump on a new branch and
+// opens a pull request (tools/release/run-bump.mjs). A branch named N.x may only release major N.
 import { execFileSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
 
