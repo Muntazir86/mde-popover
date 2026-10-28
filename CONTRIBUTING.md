@@ -39,21 +39,28 @@ Only `@muntazir/material-extended` is in the Nx release. Versioning is fixed: on
 
 Git tags use `v{version}` (`releaseTag.pattern`). On `master`, Nx looks for the latest tag across every branch. On other branches it only looks at tags reachable from that branch.
 
-Generated notes are prepended to `libs/@muntazir/material-extended/CHANGELOG.md`, above the hand-written history. Nx also opens a GitHub release for that tag. Nothing in pull-request or `master` CI publishes to npm, and the Release workflow only stages.
+Generated notes are prepended to `libs/@muntazir/material-extended/CHANGELOG.md`, above the hand-written history. Nothing in pull-request or `master` CI publishes to npm. The Release workflow never publishes directly.
+
+Protected branches only accept changes through a pull request, so shipping a bump is two runs:
+
+1. `patch`, `minor`, or `conventional` runs `nx release --skip-publish` (do not combine that with `--yes`; Nx treats them as mutually exclusive). It bumps both manifests, prepends the changelog, and commits on a new branch `release/<branch>-v<version>`. The workflow opens a pull request into the branch you selected and stops. It does not push that branch, tag, create a GitHub release, or stage on npm.
+2. Merge the pull request, then run the workflow again on the same branch with `package-version`. That tags `v{version}`, creates the GitHub release from the changelog section, builds, and stages the package. Approve the staged version with 2FA.
+
+The workflow opens that pull request with `GITHUB_TOKEN`. That works only if the repository allows Actions to create pull requests (Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests").
 
 Run a release from the branch that owns the major: `master` for the major in its `package.json`, or a maintenance branch such as `10.x` or `11.x` for its own major. The Release workflow file is the same on every branch. A branch named `N.x` can only release major `N`.
 
 Use the [Release workflow](.github/workflows/release.yml): Actions → Release → Run workflow, pick the branch (`master`, `10.x`, `11.x`, ...), type `publish`, and choose a mode:
 
-| Mode | Version published |
+| Mode | What the workflow does |
 | --- | --- |
-| `package-version` | Exactly the version in `libs/@muntazir/material-extended/package.json`. Use it for the first release of a major (for example 11.0.0 from `11.x`). It tags `v{version}`, creates the GitHub release from that version's `CHANGELOG.md` section, and stages the package. Also use it to retry a run whose staging step failed: the existing tag is accepted when it points at the released commit. |
-| `patch` / `minor` | The next patch or minor in the branch's current major. Nx Release bumps both manifests, prepends the changelog, commits, tags, pushes to the branch, and creates the GitHub release. |
-| `conventional` | The bump chosen from conventional commits since the last `v*` tag. |
+| `package-version` | Tags, creates the GitHub release, and stages the version already in `libs/@muntazir/material-extended/package.json`. Use it after a bump pull request is merged, for the first release of a major (for example 11.0.0 from `11.x`), and to retry a run whose staging step failed. An existing tag is accepted when it points at the released commit. |
+| `patch` / `minor` | Opens a pull request that bumps to the next patch or minor in the branch's current major. After you merge it, run `package-version`. |
+| `conventional` | Same as `patch` / `minor`, with the bump chosen from conventional commits since the last `v*` tag. |
 
 `tools/release/resolve-release.mjs` guards every mode. The run fails if the version would leave the major in `package.json` (for example a `feat!` commit), if a branch named `N.x` is not on major `N`, if the version is already on npm or its tag points at another commit, or if npm cannot be reached. A new major needs a manual `package.json` bump (on a new `N.x` branch or on `master`) and a `package-version` release.
 
-The dist-tag is chosen by comparing the release's major with the highest major already on npm (prereleases ignored). The highest major, or a new higher one, is staged with `latest`. Older majors get `v{major}-lts` (for example `v10-lts` once 11.0.0 is out), like the existing `v5-lts` and `v6-lts`. npm fixes the dist-tag when the package is staged; to change it, reject the staged version and run the workflow again. The GitHub release is only marked latest for the newest major; after a `patch`/`minor` release of an older major, the workflow moves the GitHub latest badge back to the release of the npm `latest` version. Pull requests and pushes do not start the workflow.
+The dist-tag is chosen by comparing the release's major with the highest major already on npm (prereleases ignored). The highest major, or a new higher one, is staged with `latest`. Older majors get `v{major}-lts` (for example `v10-lts` once 11.0.0 is out), like the existing `v5-lts` and `v6-lts`. npm fixes the dist-tag when the package is staged; to change it, reject the staged version and run the workflow again. The `package-version` run marks the GitHub release as latest only for the newest major. Pull requests and pushes do not start the workflow.
 
 ### Staged publishing
 
@@ -76,4 +83,4 @@ npx nx build @muntazir/material-extended --configuration production
 (cd dist/@muntazir/material-extended && npm stage publish --tag latest --access public --dry-run)
 ```
 
-`--dry-run` writes nothing. Do not run `nx release` without a specifier before the major has a `v{version}` tag. Without a tag, Nx counts every commit since the first one and can choose the next major.
+`--dry-run` writes nothing. The workflow's bump modes run the same `nx release patch` or `nx release minor` with `--skip-publish` (and without `--yes`) on a new branch and open a pull request; they do not tag or stage. Do not run `nx release` without a specifier before the major has a `v{version}` tag. Without a tag, Nx counts every commit since the first one and can choose the next major.
