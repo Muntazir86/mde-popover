@@ -56,6 +56,9 @@ on:
           - minor
           - conventional
 
+# pull-requests: write is not enough on its own. The repository must allow
+# Actions to create pull requests: Settings → Actions → General →
+# Workflow permissions → "Allow GitHub Actions to create and approve pull requests".
 permissions:
   contents: write # release branch, tag, and GitHub release
   pull-requests: write # release pull request for patch, minor, and conventional
